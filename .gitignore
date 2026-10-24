@@ -1,0 +1,15 @@
+node_modules/
+out/
+dist/
+release/
+*.dmg
+*.zip
+*.mp4
+*.mov
+*.m4a
+*.webm
+*.pptx
+.env
+.env.*
+.DS_Store
+*.log

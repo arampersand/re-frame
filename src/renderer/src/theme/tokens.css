@@ -1,0 +1,26 @@
+/* DUEÑO: Vic (branding). Cambia la marca aquí y se actualiza toda la app.
+   Solo variables: nada de layout. Los nombres de variable NO se renombran
+   (los usan todos los componentes); los valores sí cámbialos libremente. */
+:root {
+  --brand-name: 'Re-Frame';
+
+  --color-bg: #0f1115;
+  --color-surface: #171a21;
+  --color-surface-2: #1f232c;
+  --color-border: #2a2f3a;
+  --color-text: #e8eaf0;
+  --color-muted: #9aa1b2;
+
+  --color-primary: #7c5cff;      /* acción principal / marca */
+  --color-primary-ink: #ffffff;
+
+  /* Estados de dominio de tema: el mapa verde/amarillo/rojo/gris */
+  --color-mastered: #2fbf71;
+  --color-progress: #f2b632;
+  --color-gap: #ef5b5b;
+  --color-unseen: #5b6273;
+
+  --radius: 12px;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
