@@ -17,7 +17,7 @@
 | Magio `@magiobus` | Audio, estado por tema, frontend | `app/audio/`, `features/lectures.py`, `features/topics.py` | `features/lecture/`, `features/topics/`, `features/onboarding/`, `components/` |
 | Bart `@yosoybartsolo` | Acciones y pitch | `features/today.py`, `tools/`, `features/ingest.py` | `features/today/`, `features/receipts/` |
 | Leo `@leo12L` | Datos de demo, preguntas del onboarding, pruebas de usuario | `seed/`, textos de `BANK` en `features/onboarding.py` | — |
-| Vic | Branding y diseño del pitch | — | `theme/tokens.css`, `branding/`, `landing/` |
+| Vic `@victorleonllan` | Branding y diseño del pitch | — | `theme/tokens.css`, `branding/`, `landing/` |
 
 Leo y Vic no necesitan programar. Leo edita JSON y textos; Vic edita colores y
 archivos de diseño. Si algo requiere código, lo piden en su issue.

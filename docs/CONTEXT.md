@@ -11,7 +11,7 @@
 | Magio | magiobus | Audio, estado por tema, frontend |
 | Bart | yosoybartsolo | Acciones (Google Calendar) y pitch |
 | Leo | leo12L | Datos de demo, preguntas del onboarding, pruebas de usuario |
-| Vic | pendiente | Branding, landing y diseño del deck |
+| Vic | victorleonllan | Branding, landing y diseño del deck |
 
 ## El hackathon
 - **Dónde:** UTEP, El Paso, Texas. 3 días.
