@@ -1,0 +1,248 @@
+#!/usr/bin/env python3
+"""
+utch — cliente de la API de Moodle (VirtualTI, UTCH) para ver tareas/asignaciones.
+
+Usa los web services oficiales de Moodle (los mismos que la app móvil).
+El token se guarda en ~/.config/utch/config.json (chmod 600). La contraseña
+NUNCA se guarda: solo se usa una vez para pedir el token.
+
+Comandos:
+  utch login              Pide user+password (una vez) y guarda el token.
+  utch tareas             Lista tus asignaciones: pendientes primero, luego entregadas.
+  utch tareas --json      Igual pero volca JSON crudo (para automatizar).
+  utch agenda [--dias N]  Lo que vence en los próximos N días (default 30), vía calendario.
+  utch whoami             Verifica el token y muestra tu nombre/usuario.
+
+Sin comando = 'tareas'.
+"""
+import sys, os, json, getpass, time, urllib.request, urllib.parse, ssl
+
+WWWROOT = "https://virtualti.utch.edu.mx"
+SERVICE = "moodle_mobile_app"
+CFG_DIR = os.path.expanduser("~/.config/utch")
+CFG = os.path.join(CFG_DIR, "config.json")
+_ctx = ssl.create_default_context()
+
+
+def _post(url, params):
+    data = urllib.parse.urlencode(params).encode()
+    req = urllib.request.Request(url, data=data, headers={
+        "User-Agent": "utch-cli/1.0",
+        "Content-Type": "application/x-www-form-urlencoded",
+    })
+    with urllib.request.urlopen(req, context=_ctx, timeout=40) as r:
+        return json.loads(r.read().decode())
+
+
+def _flatten(params, prefix=""):
+    """Aplana dicts/listas al formato bracket que espera Moodle (courseids[0]=5)."""
+    out = {}
+    if isinstance(params, dict):
+        for k, v in params.items():
+            key = f"{prefix}[{k}]" if prefix else str(k)
+            out.update(_flatten(v, key))
+    elif isinstance(params, (list, tuple)):
+        for i, v in enumerate(params):
+            out.update(_flatten(v, f"{prefix}[{i}]"))
+    else:
+        if isinstance(params, bool):
+            params = 1 if params else 0
+        out[prefix] = params
+    return out
+
+
+def load_cfg():
+    if not os.path.exists(CFG):
+        sys.exit("No hay sesión. Corre primero:  utch login")
+    with open(CFG) as f:
+        return json.load(f)
+
+
+def api(fn, token, args=None):
+    url = f"{WWWROOT}/webservice/rest/server.php"
+    params = {"wstoken": token, "wsfunction": fn, "moodlewsrestformat": "json"}
+    params.update(_flatten(args or {}))
+    res = _post(url, params)
+    if isinstance(res, dict) and res.get("exception"):
+        msg = res.get("message", "error desconocido")
+        if res.get("errorcode") in ("invalidtoken", "accessexception"):
+            msg += "\n→ El token expiró o es inválido. Corre:  utch login"
+        sys.exit(f"API error ({fn}): {msg}")
+    return res
+
+
+# ---------------- comandos ----------------
+
+def cmd_login():
+    print(f"Login en {WWWROOT}")
+    env_user = os.environ.get("UTCH_USER")
+    env_pw = os.environ.get("UTCH_PASS")
+    if env_user and env_pw:
+        user, pw = env_user.strip(), env_pw
+    elif sys.stdin.isatty():
+        user = input("Usuario (matrícula): ").strip()
+        pw = getpass.getpass("Contraseña: ")
+    else:
+        sys.exit(
+            "No hay terminal interactiva (stdin no es TTY).\n"
+            "Corre 'utch login' en una terminal normal (Terminal.app / iTerm),\n"
+            "o pásalo por variables de entorno:\n"
+            "    UTCH_USER=tu_matricula UTCH_PASS='tu_password' utch login")
+    res = _post(f"{WWWROOT}/login/token.php", {
+        "username": user, "password": pw, "service": SERVICE,
+    })
+    if "token" not in res:
+        sys.exit("No se pudo obtener token: " + res.get("error", json.dumps(res)))
+    os.makedirs(CFG_DIR, exist_ok=True)
+    with open(CFG, "w") as f:
+        json.dump({"token": res["token"], "user": user, "wwwroot": WWWROOT,
+                   "saved": int(time.time())}, f)
+    os.chmod(CFG, 0o600)
+    info = api("core_webservice_get_site_info", res["token"])
+    print(f"OK. Token guardado en {CFG}")
+    print(f"Sesión: {info.get('fullname')} ({info.get('username')})")
+
+
+def cmd_whoami():
+    cfg = load_cfg()
+    info = api("core_webservice_get_site_info", cfg["token"])
+    print(f"{info.get('fullname')}  ({info.get('username')})")
+    print(f"userid: {info.get('userid')}   sitio: {info.get('sitename')}")
+
+
+def _fmt_date(ts):
+    if not ts:
+        return "sin fecha"
+    return time.strftime("%Y-%m-%d %H:%M", time.localtime(ts))
+
+
+def cmd_tareas(as_json=False, todas=False):
+    cfg = load_cfg()
+    token = cfg["token"]
+    info = api("core_webservice_get_site_info", token)
+    userid = info["userid"]
+    courses = api("core_enrol_get_users_courses", token, {"userid": userid})
+    course_name = {c["id"]: c.get("shortname") or c.get("fullname") for c in courses}
+    course_start = {c["id"]: c.get("startdate", 0) for c in courses}
+    course_ids = [c["id"] for c in courses]
+    if not course_ids:
+        sys.exit("No apareces inscrito en ninguna materia.")
+
+    data = api("mod_assign_get_assignments", token, {"courseids": course_ids})
+    rows, stale = [], []
+    for course in data.get("courses", []):
+        start = course_start.get(course["id"], 0)
+        for a in course.get("assignments", []):
+            row = {
+                "course": course_name.get(course["id"], course.get("shortname")),
+                "id": a["id"], "cmid": a["cmid"], "name": a["name"],
+                "duedate": a.get("duedate", 0),
+                "cutoffdate": a.get("cutoffdate", 0),
+                "nosubmissions": a.get("nosubmissions", 0),
+            }
+            # Tarea vieja importada de un cuatri anterior: vence ANTES de que
+            # arrancara el curso actual. Se oculta salvo --todas.
+            due = row["duedate"]
+            if due and start and due < start:
+                stale.append(row)
+            else:
+                rows.append(row)
+    if todas:
+        rows = rows + stale
+        stale = []
+
+    # estado de entrega por asignación
+    for r in rows:
+        r["submitted"] = None
+        if r["nosubmissions"]:
+            r["submitted"] = "n/a"
+            continue
+        try:
+            st = api("mod_assign_get_submission_status", token, {"assignid": r["id"]})
+            last = st.get("lastattempt", {}) or {}
+            sub = (last.get("submission") or {})
+            grading = last.get("gradingstatus") or sub.get("gradingstatus")
+            status = sub.get("status")
+            if status == "submitted":
+                r["submitted"] = "entregada" if grading != "graded" else "calificada"
+            else:
+                r["submitted"] = "PENDIENTE"
+        except SystemExit:
+            r["submitted"] = "?"
+
+    if as_json:
+        print(json.dumps(rows, ensure_ascii=False, indent=2))
+        return
+
+    now = time.time()
+    def sortkey(r):
+        return (r["submitted"] != "PENDIENTE", r["duedate"] or 9e18)
+    rows.sort(key=sortkey)
+
+    pend = [r for r in rows if r["submitted"] == "PENDIENTE"]
+    print(f"\n== PENDIENTES ({len(pend)}) ==")
+    if not pend:
+        print("  nada pendiente 🎉")
+    for r in pend:
+        due = r["duedate"]
+        tag = ""
+        if due:
+            dias = (due - now) / 86400
+            tag = "  ⚠️ VENCIDA" if dias < 0 else (f"  ⏳ en {dias:.0f}d" if dias < 3 else "")
+        print(f"  [{r['course']}] {r['name']}")
+        print(f"        vence: {_fmt_date(due)}{tag}")
+
+    done = [r for r in rows if r["submitted"] not in ("PENDIENTE",)]
+    print(f"\n== YA ENTREGADAS / OTRAS ({len(done)}) ==")
+    for r in done:
+        print(f"  [{r['course']}] {r['name']}  — {r['submitted']}  ({_fmt_date(r['duedate'])})")
+    if stale:
+        print(f"\n({len(stale)} tareas viejas importadas de cuatris pasados, ocultas — usa 'utch tareas --todas' para verlas)")
+    print()
+
+
+def cmd_agenda(dias=30):
+    cfg = load_cfg()
+    token = cfg["token"]
+    now = int(time.time())
+    res = api("core_calendar_get_action_events_by_timesort", token, {
+        "timesortfrom": now,
+        "timesortto": now + dias * 86400,
+        "limitnum": 50,
+    })
+    events = res.get("events", [])
+    print(f"\n== AGENDA próximos {dias} días ({len(events)}) ==")
+    if not events:
+        print("  vacío")
+    for e in events:
+        c = (e.get("course") or {}).get("shortname", "")
+        print(f"  {_fmt_date(e.get('timesort'))}  [{c}] {e.get('name')}")
+        url = e.get("url") or (e.get("action") or {}).get("url")
+        if url:
+            print(f"        {url}")
+    print()
+
+
+def main():
+    args = sys.argv[1:]
+    cmd = args[0] if args else "tareas"
+    rest = args[1:]
+    if cmd in ("-h", "--help", "help"):
+        print(__doc__); return
+    if cmd == "login":
+        cmd_login()
+    elif cmd == "whoami":
+        cmd_whoami()
+    elif cmd == "tareas":
+        cmd_tareas(as_json="--json" in rest, todas="--todas" in rest)
+    elif cmd == "agenda":
+        d = 30
+        if "--dias" in rest:
+            d = int(rest[rest.index("--dias") + 1])
+        cmd_agenda(d)
+    else:
+        sys.exit(f"Comando desconocido: {cmd}\n{__doc__}")
+
+
+if __name__ == "__main__":
+    main()

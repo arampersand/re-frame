@@ -57,7 +57,7 @@ BANK: list[dict] = [
         why="Me dice cómo buscas ayuda hoy, para no estorbarte y llenar el hueco correcto.")},
     {"q": OnboardingQuestion(
         id="contrast", slot="representation", kind="contrast",
-        prompt="Tres formas de explicar Big-O. ¿Cuál te hizo click más rápido?",
+        prompt="Cuatro formas de explicar Big-O. ¿Cuál te hizo click más rápido?",
         why="No te pregunto si eres visual: lo medimos. Esta será la primera forma que veas.",
         options=[
             O(id="diagram", label="Un dibujo: la curva de n² se dispara y la de log n casi no sube."),
@@ -225,6 +225,13 @@ def _view(ob: dict) -> OnboardingState:
     )
 
 
+def drop_pending_proposals() -> None:
+    """Las propuestas de Hoy se hicieron con el perfil viejo: Hoy las recalcula."""
+    actions = store.all("actions")
+    actions[:] = [a for a in actions if a["status"] != "proposed"]
+    store.save()
+
+
 def apply_to_student(profile: dict) -> None:
     """El perfil confirmado ajusta al estudiante que usan Hoy y el Explicador."""
     s, st = profile["slots"], store.student()
@@ -287,5 +294,5 @@ async def confirm(body: Confirm) -> OnboardingState:
             _set(ob["profile"], slot, Evidence(value=text.strip(), source="stated", confidence=1.0, quote=text.strip()))
     ob["profile"]["confirmed"] = True
     apply_to_student(ob["profile"])
-    store.save()
+    drop_pending_proposals()
     return _view(ob)

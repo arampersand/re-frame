@@ -53,3 +53,20 @@ def test_today_respects_study_window_from_profile(client):
     for a in client.get("/api/today").json()["actions"]:
         if a["status"] == "proposed":
             assert 18 <= datetime.fromisoformat(a["start_at"]).hour < 23
+
+
+def test_confirm_replans_today_with_new_profile(client):
+    from datetime import datetime
+    client.post("/api/onboarding/start")
+    client.get("/api/today")  # propuestas con el perfil vacío (ventana default)
+    for qid, kw in (("goal", {"skipped": True}), ("work", {"option_id": "30+"}),
+                    ("window", {"option_id": "morning"}), ("episode", {"skipped": True}),
+                    ("contrast", {"option_id": "diagram"}), ("lang", {"option_id": "es"}),
+                    ("worry", {"option_id": "c_ed"})):
+        _answer(client, qid, **kw)
+    client.post("/api/onboarding/confirm", json={})
+    proposed = [a for a in client.get("/api/today").json()["actions"] if a["status"] == "proposed"]
+    assert proposed
+    for a in proposed:
+        start, end = datetime.fromisoformat(a["start_at"]), datetime.fromisoformat(a["end_at"])
+        assert 7 <= start.hour < 12 and (end - start).seconds // 60 <= 25

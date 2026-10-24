@@ -1,0 +1,24 @@
+---
+type: person
+status: activo
+date: 2026-09-02
+last-updated: 2026-09-02
+tags: [person, utch, escuela, profesor]
+ai-first: true
+---
+
+## For future Claude
+
+José Enrique Iglesias García es profesor(a) de [[Fora]] en el 10º cuatrimestre de la [[utch]] (carrera Entornos Virtuales y Negocios Digitales), materia **Inglés IX**. Stub creado 2026-09-02 desde el listado de cursos del Moodle: el nombre completo y la materia son `stated`, todo lo demás está en blanco. Enriquecer conforme haya trato.
+
+# José Enrique Iglesias García
+
+- **Rol:** profesor(a), [[utch]]
+- **Materia:** [[11-ESCUELA/10-cuatrimestre/ingles-ix/_moc-ingles-ix|Inglés IX]] (10º cuatrimestre, Programa educativo 2020 / Matutino)
+- **Contacto:** desconocido
+
+## Notas
+
+- _sin interacciones registradas_
+
+Relacionado: [[utch]] · [[Fora]] · [[11-ESCUELA/_moc-escuela|Escuela]]
