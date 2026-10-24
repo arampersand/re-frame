@@ -1,0 +1,8 @@
+# Estos archivos los usan los 7. Cambios aquí piden revisión del integrador.
+/backend/app/contracts.py        @arampersand
+/contracts/                      @arampersand
+/backend/app/main.py             @arampersand
+/backend/app/store.py            @arampersand
+/desktop/src/renderer/src/api/   @arampersand
+/desktop/src/renderer/src/App.tsx @arampersand
+/.github/                        @arampersand

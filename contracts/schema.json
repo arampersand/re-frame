@@ -1,0 +1,758 @@
+{
+  "$defs": {
+    "AskRequest": {
+      "properties": {
+        "lang": {
+          "anyOf": [
+            {
+              "enum": [
+                "es",
+                "en"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "AskRequest",
+      "type": "object"
+    },
+    "AskResponse": {
+      "properties": {
+        "guided_steps": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "message": {
+          "type": "string"
+        },
+        "refused": {
+          "type": "boolean"
+        },
+        "suggested_action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProposedAction"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "refused",
+        "message",
+        "guided_steps",
+        "suggested_action"
+      ],
+      "title": "AskResponse",
+      "type": "object"
+    },
+    "Course": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "professor": {
+          "default": "",
+          "type": "string"
+        },
+        "schedule": {
+          "default": "",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "professor",
+        "schedule"
+      ],
+      "title": "Course",
+      "type": "object"
+    },
+    "Deadline": {
+      "properties": {
+        "course_id": {
+          "type": "string"
+        },
+        "due_at": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "default": "tarea",
+          "enum": [
+            "tarea",
+            "examen",
+            "proyecto",
+            "quiz"
+          ],
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "topic_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "course_id",
+        "title",
+        "due_at",
+        "topic_ids",
+        "kind"
+      ],
+      "title": "Deadline",
+      "type": "object"
+    },
+    "ExplainRequest": {
+      "properties": {
+        "lang": {
+          "anyOf": [
+            {
+              "enum": [
+                "es",
+                "en"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "lecture_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "segment_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "text": {
+          "type": "string"
+        },
+        "topic_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "ExplainRequest",
+      "type": "object"
+    },
+    "Explanation": {
+      "properties": {
+        "analogy": {
+          "type": "string"
+        },
+        "degraded": {
+          "default": false,
+          "type": "boolean"
+        },
+        "diagram_mermaid": {
+          "type": "string"
+        },
+        "lang": {
+          "default": "es",
+          "enum": [
+            "es",
+            "en"
+          ],
+          "type": "string"
+        },
+        "quiz": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/QuizQuestion"
+          },
+          "type": "array"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "topic_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "topic_title": {
+          "type": "string"
+        },
+        "worked_example": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "topic_id",
+        "topic_title",
+        "lang",
+        "diagram_mermaid",
+        "analogy",
+        "worked_example",
+        "summary",
+        "quiz",
+        "degraded"
+      ],
+      "title": "Explanation",
+      "type": "object"
+    },
+    "Lecture": {
+      "properties": {
+        "course_id": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "recorded_at": {
+          "type": "string"
+        },
+        "segments": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Segment"
+          },
+          "type": "array"
+        },
+        "status": {
+          "default": "done",
+          "enum": [
+            "recording",
+            "done"
+          ],
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "topic_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "course_id",
+        "title",
+        "recorded_at",
+        "status",
+        "topic_ids",
+        "segments"
+      ],
+      "title": "Lecture",
+      "type": "object"
+    },
+    "ProposedAction": {
+      "properties": {
+        "deadline_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "end_at": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "study_block",
+            "reminder"
+          ],
+          "type": "string"
+        },
+        "receipt_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "start_at": {
+          "type": "string"
+        },
+        "status": {
+          "default": "proposed",
+          "enum": [
+            "proposed",
+            "approved",
+            "rejected",
+            "done",
+            "failed"
+          ],
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "topic_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "why": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "title",
+        "why",
+        "topic_ids",
+        "deadline_id",
+        "start_at",
+        "end_at",
+        "status",
+        "receipt_id"
+      ],
+      "title": "ProposedAction",
+      "type": "object"
+    },
+    "QuizQuestion": {
+      "properties": {
+        "answer_index": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 2,
+          "type": "array"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "why": {
+          "default": "",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "options",
+        "answer_index",
+        "why"
+      ],
+      "title": "QuizQuestion",
+      "type": "object"
+    },
+    "QuizResult": {
+      "properties": {
+        "correct": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "total": {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "correct",
+        "total"
+      ],
+      "title": "QuizResult",
+      "type": "object"
+    },
+    "Receipt": {
+      "description": "Prueba del sistema destino. Sin recibo, el estado es desconocido.",
+      "properties": {
+        "action_id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "external_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "external_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "id": {
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "status": {
+          "enum": [
+            "sent",
+            "failed",
+            "skipped"
+          ],
+          "type": "string"
+        },
+        "target": {
+          "const": "google_calendar",
+          "type": "string"
+        },
+        "verified": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "action_id",
+        "target",
+        "status",
+        "reason",
+        "verified",
+        "external_id",
+        "external_url",
+        "created_at"
+      ],
+      "title": "Receipt",
+      "type": "object"
+    },
+    "Segment": {
+      "properties": {
+        "confused": {
+          "default": false,
+          "type": "boolean"
+        },
+        "end_s": {
+          "type": "number"
+        },
+        "id": {
+          "type": "string"
+        },
+        "lang": {
+          "anyOf": [
+            {
+              "enum": [
+                "es",
+                "en"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "lecture_id": {
+          "type": "string"
+        },
+        "start_s": {
+          "type": "number"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "lecture_id",
+        "start_s",
+        "end_s",
+        "text",
+        "lang",
+        "confused"
+      ],
+      "title": "Segment",
+      "type": "object"
+    },
+    "Student": {
+      "properties": {
+        "career": {
+          "type": "string"
+        },
+        "goal": {
+          "default": "",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "preferred_lang": {
+          "default": "es",
+          "enum": [
+            "es",
+            "en"
+          ],
+          "type": "string"
+        },
+        "preferred_representation": {
+          "default": "diagram",
+          "enum": [
+            "diagram",
+            "analogy",
+            "example",
+            "summary"
+          ],
+          "type": "string"
+        },
+        "semester": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "career",
+        "semester",
+        "preferred_lang",
+        "goal",
+        "preferred_representation"
+      ],
+      "title": "Student",
+      "type": "object"
+    },
+    "TodayView": {
+      "properties": {
+        "actions": {
+          "items": {
+            "$ref": "#/$defs/ProposedAction"
+          },
+          "type": "array"
+        },
+        "date": {
+          "type": "string"
+        },
+        "student": {
+          "$ref": "#/$defs/Student"
+        },
+        "upcoming": {
+          "items": {
+            "$ref": "#/$defs/Deadline"
+          },
+          "type": "array"
+        },
+        "weakest_topics": {
+          "items": {
+            "$ref": "#/$defs/Topic"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "date",
+        "student",
+        "actions",
+        "upcoming",
+        "weakest_topics"
+      ],
+      "title": "TodayView",
+      "type": "object"
+    },
+    "Topic": {
+      "properties": {
+        "confused_count": {
+          "default": 0,
+          "type": "integer"
+        },
+        "course_id": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_seen_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "prerequisites": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "score": {
+          "default": 0.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "status": {
+          "default": "sin_ver",
+          "enum": [
+            "sin_ver",
+            "laguna",
+            "en_progreso",
+            "dominado"
+          ],
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "course_id",
+        "title",
+        "status",
+        "score",
+        "confused_count",
+        "last_seen_at",
+        "prerequisites"
+      ],
+      "title": "Topic",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "AskRequest": {
+      "$ref": "#/$defs/AskRequest"
+    },
+    "AskResponse": {
+      "$ref": "#/$defs/AskResponse"
+    },
+    "Course": {
+      "$ref": "#/$defs/Course"
+    },
+    "Deadline": {
+      "$ref": "#/$defs/Deadline"
+    },
+    "ExplainRequest": {
+      "$ref": "#/$defs/ExplainRequest"
+    },
+    "Explanation": {
+      "$ref": "#/$defs/Explanation"
+    },
+    "Lecture": {
+      "$ref": "#/$defs/Lecture"
+    },
+    "ProposedAction": {
+      "$ref": "#/$defs/ProposedAction"
+    },
+    "QuizQuestion": {
+      "$ref": "#/$defs/QuizQuestion"
+    },
+    "QuizResult": {
+      "$ref": "#/$defs/QuizResult"
+    },
+    "Receipt": {
+      "$ref": "#/$defs/Receipt"
+    },
+    "Segment": {
+      "$ref": "#/$defs/Segment"
+    },
+    "Student": {
+      "$ref": "#/$defs/Student"
+    },
+    "TodayView": {
+      "$ref": "#/$defs/TodayView"
+    },
+    "Topic": {
+      "$ref": "#/$defs/Topic"
+    }
+  },
+  "title": "ReFrameContracts",
+  "type": "object"
+}

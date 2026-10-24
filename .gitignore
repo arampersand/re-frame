@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+backend/data/
+node_modules/
+desktop/out/
+desktop/dist/
+.DS_Store
+*.log
+.playwright-mcp/

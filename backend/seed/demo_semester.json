@@ -1,0 +1,549 @@
+{
+  "student": {
+    "id": "stu_demo",
+    "name": "Sofía Ramírez",
+    "career": "Ingeniería en Sistemas Computacionales",
+    "semester": 3,
+    "preferred_lang": "es",
+    "goal": "Pasar Estructuras de Datos con A y conseguir internship de backend en verano",
+    "preferred_representation": "diagram"
+  },
+  "courses": [
+    {
+      "id": "c_ed",
+      "name": "Estructuras de Datos",
+      "professor": "Dr. Herrera",
+      "schedule": "L/M 10:30-11:50"
+    },
+    {
+      "id": "c_md",
+      "name": "Matemáticas Discretas",
+      "professor": "Dra. Castillo",
+      "schedule": "M/J 08:30-09:50"
+    },
+    {
+      "id": "c_al",
+      "name": "Álgebra Lineal",
+      "professor": "Prof. Núñez",
+      "schedule": "L/M 13:30-14:50"
+    },
+    {
+      "id": "c_ac",
+      "name": "Arquitectura de Computadoras",
+      "professor": "Ing. Torres",
+      "schedule": "M/J 16:30-17:50"
+    }
+  ],
+  "deadlines": [
+    {
+      "id": "d_ex2",
+      "course_id": "c_ed",
+      "title": "Examen parcial 2: árboles",
+      "due_at": "rel:+4d@10:30",
+      "topic_ids": [
+        "t_bst",
+        "t_avl",
+        "t_heap"
+      ],
+      "kind": "examen"
+    },
+    {
+      "id": "d_hw5",
+      "course_id": "c_ed",
+      "title": "Tarea 5: implementar heap",
+      "due_at": "rel:+2d@23:59",
+      "topic_ids": [
+        "t_heap"
+      ],
+      "kind": "tarea"
+    },
+    {
+      "id": "d_md4",
+      "course_id": "c_md",
+      "title": "Tarea 4: relaciones",
+      "due_at": "rel:+3d@23:59",
+      "topic_ids": [
+        "t_rel",
+        "t_induc"
+      ],
+      "kind": "tarea"
+    },
+    {
+      "id": "d_alq",
+      "course_id": "c_al",
+      "title": "Quiz eigenvalores",
+      "due_at": "rel:+5d@13:30",
+      "topic_ids": [
+        "t_det",
+        "t_eigen"
+      ],
+      "kind": "quiz"
+    },
+    {
+      "id": "d_mips",
+      "course_id": "c_ac",
+      "title": "Proyecto MIPS: calculadora",
+      "due_at": "rel:+12d@23:59",
+      "topic_ids": [
+        "t_mips"
+      ],
+      "kind": "proyecto"
+    }
+  ],
+  "topics": [
+    {
+      "id": "t_bigo",
+      "course_id": "c_ed",
+      "title": "Notación Big-O",
+      "status": "dominado",
+      "score": 0.86,
+      "confused_count": 0,
+      "last_seen_at": "rel:-20d@10:30",
+      "prerequisites": []
+    },
+    {
+      "id": "t_bst",
+      "course_id": "c_ed",
+      "title": "Árboles binarios de búsqueda",
+      "status": "en_progreso",
+      "score": 0.62,
+      "confused_count": 1,
+      "last_seen_at": "rel:-9d@10:30",
+      "prerequisites": [
+        "t_bigo"
+      ]
+    },
+    {
+      "id": "t_avl",
+      "course_id": "c_ed",
+      "title": "Rotaciones AVL",
+      "status": "laguna",
+      "score": 0.31,
+      "confused_count": 3,
+      "last_seen_at": "rel:-2d@10:30",
+      "prerequisites": [
+        "t_bst"
+      ]
+    },
+    {
+      "id": "t_heap",
+      "course_id": "c_ed",
+      "title": "Heaps y colas de prioridad",
+      "status": "laguna",
+      "score": 0.38,
+      "confused_count": 1,
+      "last_seen_at": "rel:-5d@10:30",
+      "prerequisites": [
+        "t_bst"
+      ]
+    },
+    {
+      "id": "t_hash",
+      "course_id": "c_ed",
+      "title": "Tablas hash",
+      "status": "sin_ver",
+      "score": 0.0,
+      "confused_count": 0,
+      "last_seen_at": null,
+      "prerequisites": []
+    },
+    {
+      "id": "t_grafos",
+      "course_id": "c_ed",
+      "title": "Recorridos BFS y DFS",
+      "status": "sin_ver",
+      "score": 0.0,
+      "confused_count": 0,
+      "last_seen_at": null,
+      "prerequisites": []
+    },
+    {
+      "id": "t_logica",
+      "course_id": "c_md",
+      "title": "Lógica proposicional",
+      "status": "dominado",
+      "score": 0.9,
+      "confused_count": 0,
+      "last_seen_at": "rel:-25d@08:30",
+      "prerequisites": []
+    },
+    {
+      "id": "t_induc",
+      "course_id": "c_md",
+      "title": "Inducción matemática",
+      "status": "en_progreso",
+      "score": 0.55,
+      "confused_count": 2,
+      "last_seen_at": "rel:-6d@08:30",
+      "prerequisites": [
+        "t_logica"
+      ]
+    },
+    {
+      "id": "t_rel",
+      "course_id": "c_md",
+      "title": "Relaciones de equivalencia",
+      "status": "laguna",
+      "score": 0.4,
+      "confused_count": 1,
+      "last_seen_at": "rel:-1d@08:30",
+      "prerequisites": []
+    },
+    {
+      "id": "t_comb",
+      "course_id": "c_md",
+      "title": "Combinatoria",
+      "status": "sin_ver",
+      "score": 0.0,
+      "confused_count": 0,
+      "last_seen_at": null,
+      "prerequisites": []
+    },
+    {
+      "id": "t_matrices",
+      "course_id": "c_al",
+      "title": "Operaciones con matrices",
+      "status": "dominado",
+      "score": 0.8,
+      "confused_count": 0,
+      "last_seen_at": "rel:-18d@13:30",
+      "prerequisites": []
+    },
+    {
+      "id": "t_det",
+      "course_id": "c_al",
+      "title": "Determinantes",
+      "status": "en_progreso",
+      "score": 0.58,
+      "confused_count": 0,
+      "last_seen_at": "rel:-8d@13:30",
+      "prerequisites": [
+        "t_matrices"
+      ]
+    },
+    {
+      "id": "t_eigen",
+      "course_id": "c_al",
+      "title": "Eigenvalores y eigenvectores",
+      "status": "laguna",
+      "score": 0.28,
+      "confused_count": 2,
+      "last_seen_at": "rel:-1d@13:30",
+      "prerequisites": [
+        "t_det"
+      ]
+    },
+    {
+      "id": "t_bin",
+      "course_id": "c_ac",
+      "title": "Representación binaria y complemento a 2",
+      "status": "dominado",
+      "score": 0.92,
+      "confused_count": 0,
+      "last_seen_at": "rel:-22d@16:30",
+      "prerequisites": []
+    },
+    {
+      "id": "t_mips",
+      "course_id": "c_ac",
+      "title": "Ensamblador MIPS",
+      "status": "en_progreso",
+      "score": 0.5,
+      "confused_count": 1,
+      "last_seen_at": "rel:-4d@16:30",
+      "prerequisites": [
+        "t_bin"
+      ]
+    },
+    {
+      "id": "t_cache",
+      "course_id": "c_ac",
+      "title": "Memoria caché",
+      "status": "sin_ver",
+      "score": 0.0,
+      "confused_count": 0,
+      "last_seen_at": null,
+      "prerequisites": []
+    }
+  ],
+  "lectures": [
+    {
+      "id": "lec_avl",
+      "course_id": "c_ed",
+      "title": "Árboles AVL y rotaciones",
+      "recorded_at": "rel:-2d@10:30",
+      "status": "done",
+      "topic_ids": [
+        "t_bst",
+        "t_avl"
+      ],
+      "segments": [
+        {
+          "id": "lec_avl_s0",
+          "lecture_id": "lec_avl",
+          "start_s": 0.0,
+          "end_s": 14.0,
+          "text": "Bueno, la clase pasada vimos árboles binarios de búsqueda y el problema es que se pueden desbalancear.",
+          "lang": "es",
+          "confused": false
+        },
+        {
+          "id": "lec_avl_s1",
+          "lecture_id": "lec_avl",
+          "start_s": 15.0,
+          "end_s": 29.0,
+          "text": "Si insertas 10, 20, 30 en orden, el árbol se vuelve básicamente una lista ligada, y la búsqueda ya es O de n.",
+          "lang": "es",
+          "confused": false
+        },
+        {
+          "id": "lec_avl_s2",
+          "lecture_id": "lec_avl",
+          "start_s": 30.0,
+          "end_s": 44.0,
+          "text": "Para evitar eso usamos árboles AVL: en cada nodo la diferencia de alturas entre subárbol izquierdo y derecho es como máximo uno.",
+          "lang": "es",
+          "confused": false
+        },
+        {
+          "id": "lec_avl_s3",
+          "lecture_id": "lec_avl",
+          "start_s": 45.0,
+          "end_s": 59.0,
+          "text": "A esa diferencia le llamamos el factor de balance. Si después de insertar un nodo el factor es dos o menos dos, hay que rotar.",
+          "lang": "es",
+          "confused": false
+        },
+        {
+          "id": "lec_avl_s4",
+          "lecture_id": "lec_avl",
+          "start_s": 60.0,
+          "end_s": 74.0,
+          "text": "Hay cuatro casos: izquierda-izquierda, derecha-derecha, izquierda-derecha y derecha-izquierda.",
+          "lang": "es",
+          "confused": false
+        },
+        {
+          "id": "lec_avl_s5",
+          "lecture_id": "lec_avl",
+          "start_s": 75.0,
+          "end_s": 89.0,
+          "text": "En el caso derecha-derecha hacemos una rotación simple a la izquierda: el hijo derecho sube y el nodo desbalanceado baja a su izquierda.",
+          "lang": "es",
+          "confused": false
+        },
+        {
+          "id": "lec_avl_s6",
+          "lecture_id": "lec_avl",
+          "start_s": 90.0,
+          "end_s": 104.0,
+          "text": "In the left-right case you need a double rotation: first rotate the child left, then rotate the node right.",
+          "lang": "en",
+          "confused": true
+        },
+        {
+          "id": "lec_avl_s7",
+          "lecture_id": "lec_avl",
+          "start_s": 105.0,
+          "end_s": 119.0,
+          "text": "Ojo, el subárbol izquierdo del nodo que sube se convierte en el subárbol derecho del que baja. Ahí es donde todos se equivocan.",
+          "lang": "es",
+          "confused": true
+        },
+        {
+          "id": "lec_avl_s8",
+          "lecture_id": "lec_avl",
+          "start_s": 120.0,
+          "end_s": 134.0,
+          "text": "Para el examen quiero que puedan insertar una secuencia y dibujar cada rotación paso a paso.",
+          "lang": "es",
+          "confused": false
+        }
+      ]
+    },
+    {
+      "id": "lec_heap",
+      "course_id": "c_ed",
+      "title": "Heaps y colas de prioridad",
+      "recorded_at": "rel:-5d@10:30",
+      "status": "done",
+      "topic_ids": [
+        "t_heap"
+      ],
+      "segments": [
+        {
+          "id": "lec_heap_s0",
+          "lecture_id": "lec_heap",
+          "start_s": 0.0,
+          "end_s": 14.0,
+          "text": "Hoy vemos heaps. Un heap es un árbol binario completo que guardamos en un arreglo.",
+          "lang": "es",
+          "confused": false
+        },
+        {
+          "id": "lec_heap_s1",
+          "lecture_id": "lec_heap",
+          "start_s": 15.0,
+          "end_s": 29.0,
+          "text": "Para el nodo en la posición i, sus hijos están en 2i más uno y 2i más dos.",
+          "lang": "es",
+          "confused": false
+        },
+        {
+          "id": "lec_heap_s2",
+          "lecture_id": "lec_heap",
+          "start_s": 30.0,
+          "end_s": 44.0,
+          "text": "En un min-heap cada padre es menor o igual que sus hijos, entonces la raíz es el mínimo.",
+          "lang": "es",
+          "confused": false
+        },
+        {
+          "id": "lec_heap_s3",
+          "lecture_id": "lec_heap",
+          "start_s": 45.0,
+          "end_s": 59.0,
+          "text": "Insertar es poner al final y hacer sift-up; extraer el mínimo es mover el último a la raíz y hacer sift-down.",
+          "lang": "es",
+          "confused": true
+        },
+        {
+          "id": "lec_heap_s4",
+          "lecture_id": "lec_heap",
+          "start_s": 60.0,
+          "end_s": 74.0,
+          "text": "Las dos operaciones son O de log n porque la altura del árbol completo es log n.",
+          "lang": "es",
+          "confused": false
+        }
+      ]
+    },
+    {
+      "id": "lec_eig",
+      "course_id": "c_al",
+      "title": "Eigenvalores",
+      "recorded_at": "rel:-1d@13:30",
+      "status": "done",
+      "topic_ids": [
+        "t_eigen"
+      ],
+      "segments": [
+        {
+          "id": "lec_eig_s0",
+          "lecture_id": "lec_eig",
+          "start_s": 0.0,
+          "end_s": 14.0,
+          "text": "Un eigenvector de A es un vector que, al multiplicarlo por A, solo cambia de tamaño, no de dirección.",
+          "lang": "es",
+          "confused": false
+        },
+        {
+          "id": "lec_eig_s1",
+          "lecture_id": "lec_eig",
+          "start_s": 15.0,
+          "end_s": 29.0,
+          "text": "El factor por el que cambia es el eigenvalor lambda: A por v igual a lambda por v.",
+          "lang": "es",
+          "confused": false
+        },
+        {
+          "id": "lec_eig_s2",
+          "lecture_id": "lec_eig",
+          "start_s": 30.0,
+          "end_s": 44.0,
+          "text": "Para encontrarlos resolvemos el determinante de A menos lambda I igual a cero.",
+          "lang": "es",
+          "confused": true
+        },
+        {
+          "id": "lec_eig_s3",
+          "lecture_id": "lec_eig",
+          "start_s": 45.0,
+          "end_s": 59.0,
+          "text": "That's the characteristic polynomial; its roots are the eigenvalues.",
+          "lang": "en",
+          "confused": false
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "id": "act_past1",
+      "kind": "study_block",
+      "title": "Repasar Inducción matemática (Matemáticas Discretas)",
+      "why": "Tu tarea de inducción vencía en 2 días y el tema estaba en laguna (35%).",
+      "topic_ids": [
+        "t_induc"
+      ],
+      "deadline_id": null,
+      "start_at": "rel:-3d@18:00",
+      "end_at": "rel:-3d@18:50",
+      "status": "done",
+      "receipt_id": "rcp_past1"
+    }
+  ],
+  "receipts": [
+    {
+      "id": "rcp_past1",
+      "action_id": "act_past1",
+      "target": "google_calendar",
+      "status": "sent",
+      "reason": null,
+      "verified": true,
+      "external_id": "demo-event-1",
+      "external_url": null,
+      "created_at": "rel:-4d@21:10"
+    }
+  ],
+  "canned_explanations": {
+    "t_avl": {
+      "topic_id": "t_avl",
+      "topic_title": "Rotaciones AVL",
+      "lang": "es",
+      "degraded": false,
+      "diagram_mermaid": "flowchart LR\n  subgraph Antes[\"Antes: desbalance derecha-derecha\"]\n    A10((10)) --> A20((20))\n    A20 --> A30((30))\n  end\n  subgraph Despues[\"Después: rotación a la izquierda\"]\n    B20((20)) --> B10((10))\n    B20 --> B30((30))\n  end\n  Antes -->|\"20 sube, 10 baja a su izquierda\"| Despues",
+      "analogy": "Imagina un móvil colgante de cuna: si cuelgas todo de un lado, se inclina. Rotar es mover el punto de donde cuelga para que quede parejo, sin cambiar el orden de las piezas de izquierda a derecha.",
+      "worked_example": "Inserta 10, 20, 30.\n1. 10 es raíz. 20 va a su derecha. 30 va a la derecha de 20.\n2. Factor de balance de 10 = altura(izq) - altura(der) = 0 - 2 = -2 → desbalance.\n3. Caso derecha-derecha → rotación simple a la izquierda sobre 10.\n4. 20 sube a raíz; 10 queda como hijo izquierdo; 30 sigue como hijo derecho.\n5. Si 20 tenía hijo izquierdo (p. ej. 15), pasa a ser hijo derecho de 10.",
+      "summary": "- Factor de balance = altura izquierda − altura derecha; debe quedar en −1, 0 o 1.\n- Casos LL y RR: una rotación. Casos LR y RL: dos rotaciones.\n- El subárbol interno del nodo que sube cambia de padre: ahí está el error típico.",
+      "quiz": [
+        {
+          "id": "q1",
+          "prompt": "Insertas 30, 20, 10 en un AVL vacío. ¿Qué rotación se necesita?",
+          "options": [
+            "Simple a la derecha",
+            "Simple a la izquierda",
+            "Doble izquierda-derecha",
+            "Ninguna"
+          ],
+          "answer_index": 0,
+          "why": "Es el caso izquierda-izquierda: 10 cuelga a la izquierda de 20, que cuelga a la izquierda de 30."
+        },
+        {
+          "id": "q2",
+          "prompt": "¿Qué valores puede tener el factor de balance en un AVL válido?",
+          "options": [
+            "0 o 1",
+            "−1, 0 o 1",
+            "Cualquier entero",
+            "Solo 0"
+          ],
+          "answer_index": 1,
+          "why": "La definición permite diferencia de alturas de a lo más uno."
+        },
+        {
+          "id": "q3",
+          "prompt": "En una rotación a la izquierda sobre X con hijo derecho Y, ¿a dónde va el subárbol izquierdo de Y?",
+          "options": [
+            "Se elimina",
+            "Se vuelve hijo derecho de X",
+            "Se vuelve hijo izquierdo de Y",
+            "Se vuelve raíz"
+          ],
+          "answer_index": 1,
+          "why": "Sus valores son mayores que X y menores que Y, así que quedan a la derecha de X."
+        }
+      ]
+    }
+  }
+}

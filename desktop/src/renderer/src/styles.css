@@ -1,0 +1,24 @@
+@import 'tailwindcss';
+@import './theme/tokens.css';
+
+/* Tailwind lee los tokens de Vic: bg-surface, text-muted, border-border, etc. */
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-2: var(--color-surface-2);
+  --color-border: var(--color-border);
+  --color-text: var(--color-text);
+  --color-muted: var(--color-muted);
+  --color-primary: var(--color-primary);
+  --color-primary-ink: var(--color-primary-ink);
+  --color-mastered: var(--color-mastered);
+  --color-progress: var(--color-progress);
+  --color-gap: var(--color-gap);
+  --color-unseen: var(--color-unseen);
+  --radius-card: var(--radius);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+html, body, #root { height: 100%; }
+body { margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-sans); }
