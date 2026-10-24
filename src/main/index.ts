@@ -1,7 +1,7 @@
 import { app, BrowserWindow, dialog, ipcMain, session, shell } from 'electron'
 import { join } from 'node:path'
 import { ensureVault, tree, readNote, courses, vaultPath, graph } from './vault'
-import { codexStatus, codexLogin } from './codex'
+import { codexStatus, codexLogin, prepareCodex } from './codex'
 import { testKey } from './groq'
 import { getGroqKey, setGroqKey } from './settings'
 import { listChats, getChat, newChat, sendChat, startLecture, lectureChunk, finishLecture, importPdf } from './brain'
@@ -72,6 +72,7 @@ function registerIpc() {
 
 app.whenReady().then(() => {
   ensureVault()
+  prepareCodex()
   session.defaultSession.setPermissionRequestHandler((_wc, permission, cb) => cb(permission === 'media'))
   registerIpc()
   createWindow()

@@ -5,6 +5,7 @@ import { ChatScreen } from '@/features/chat/ChatScreen'
 import { BrainScreen } from '@/features/brain/BrainScreen'
 import { RecordScreen } from '@/features/record/RecordScreen'
 import { IntegrationsScreen } from '@/features/integrations/IntegrationsScreen'
+import { Welcome } from '@/features/welcome/Welcome'
 
 type ScreenId = 'chat' | 'brain' | 'record' | 'integrations'
 const NAV: { id: ScreenId; label: string; icon: string }[] = [
@@ -19,17 +20,21 @@ export function App() {
   const [note, setNote] = useState<string | null>(null)
   const [codexOk, setCodexOk] = useState<boolean | null>(null)
   const [groqOk, setGroqOk] = useState<boolean | null>(null)
+  const [welcome, setWelcome] = useState(false)
 
   const refreshStatus = () => {
     rf.codex.status().then(s => setCodexOk(s.loggedIn))
     rf.groq.status().then(s => setGroqOk(s.hasKey))
   }
   useEffect(refreshStatus, [screen])
+  useEffect(() => { rf.codex.status().then(s => setWelcome(!s.loggedIn)) }, [])
 
   const openNote = (path: string) => {
     setNote(path.endsWith('.md') || path.endsWith('.pdf') ? path : `${path}.md`)
     setScreen('brain')
   }
+
+  if (welcome) return <Welcome onDone={() => { setWelcome(false); refreshStatus() }} />
 
   return (
     <div className="flex h-full">

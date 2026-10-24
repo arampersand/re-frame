@@ -10,7 +10,8 @@
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit",
     "postinstall": "node node_modules/electron/install.js",
-    "dist": "electron-vite build && electron-builder --mac --arm64 --x64"
+    "dist": "node scripts/fetch-codex.mjs && electron-vite build && electron-builder --mac --arm64 --x64",
+    "fetch-codex": "node scripts/fetch-codex.mjs"
   },
   "dependencies": {
     "d3-force": "3.0.0",
@@ -63,7 +64,13 @@
       ],
       "extendInfo": {
         "NSMicrophoneUsageDescription": "MyBrainBook records your classes to transcribe them into your notes."
-      }
+      },
+      "extraResources": [
+        {
+          "from": "vendor/codex/${arch}",
+          "to": "codex"
+        }
+      ]
     },
     "dmg": {
       "artifactName": "MyBrainBook-${version}-${arch}.${ext}",

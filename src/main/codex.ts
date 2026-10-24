@@ -1,6 +1,22 @@
+import { app } from 'electron'
 import { spawn, execFile, execFileSync } from 'node:child_process'
+import { existsSync } from 'node:fs'
 import { homedir } from 'node:os'
+import { join } from 'node:path'
 import { vaultPath } from './vault'
+
+// Codex ships inside the app (official @openai/codex binaries), so students install nothing.
+const bundledDir = app.isPackaged
+  ? join(process.resourcesPath, 'codex')
+  : join(app.getAppPath(), 'vendor', 'codex', process.arch)
+const BUNDLED = existsSync(join(bundledDir, 'codex'))
+const CODEX = BUNDLED ? join(bundledDir, 'codex') : 'codex'
+
+/** Downloaded apps carry the quarantine flag; clear it on our own helper binaries. */
+export function prepareCodex() {
+  if (!BUNDLED || !app.isPackaged) return
+  try { execFileSync('xattr', ['-dr', 'com.apple.quarantine', bundledDir]) } catch { /* not quarantined or read-only */ }
+}
 
 // Apps launched from Finder don't inherit the shell PATH: ask the login shell, plus common spots.
 function shellPath(): string {
@@ -8,7 +24,7 @@ function shellPath(): string {
     return execFileSync(process.env.SHELL || '/bin/zsh', ['-ilc', 'printf %s "$PATH"'], { timeout: 4000, encoding: 'utf8' }).trim()
   } catch { return '' }
 }
-const PATH = [shellPath(), '/opt/homebrew/bin', '/usr/local/bin', `${homedir()}/.local/bin`, `${homedir()}/.npm-global/bin`, '/usr/bin', '/bin', process.env.PATH ?? '']
+const PATH = [...(BUNDLED ? [bundledDir] : []), shellPath(), '/opt/homebrew/bin', '/usr/local/bin', `${homedir()}/.local/bin`, `${homedir()}/.npm-global/bin`, '/usr/bin', '/bin', process.env.PATH ?? '']
   .filter(Boolean).join(':')
 const env = { ...process.env, PATH }
 
@@ -34,7 +50,7 @@ export function runCodex(prompt: string, sessionId: string | null, onEvent: (e: 
   else args.push(prompt)
 
   return new Promise(res => {
-    const child = spawn('codex', args, { env, cwd: vaultPath(), stdio: ['ignore', 'pipe', 'pipe'] })
+    const child = spawn(CODEX, args, { env, cwd: vaultPath(), stdio: ['ignore', 'pipe', 'pipe'] })
     let sid = sessionId
     let last = ''
     let buf = ''
@@ -80,9 +96,9 @@ export function runCodex(prompt: string, sessionId: string | null, onEvent: (e: 
 
 export function codexStatus(): Promise<{ installed: boolean; loggedIn: boolean; detail: string }> {
   return new Promise(res => {
-    execFile('codex', ['login', 'status'], { env }, (err, stdout, stderr) => {
+    execFile(CODEX, ['login', 'status'], { env }, (err, stdout, stderr) => {
       const out = `${stdout}${stderr}`.trim()
-      if (err && (err as NodeJS.ErrnoException).code === 'ENOENT') return res({ installed: false, loggedIn: false, detail: 'Codex CLI not installed' })
+      if (err && (err as NodeJS.ErrnoException).code === 'ENOENT') return res({ installed: false, loggedIn: false, detail: 'AI engine missing from this build' })
       res({ installed: true, loggedIn: /logged in/i.test(out) && !/not logged in/i.test(out), detail: out })
     })
   })
@@ -90,7 +106,7 @@ export function codexStatus(): Promise<{ installed: boolean; loggedIn: boolean; 
 
 export function codexLogin(): Promise<boolean> {
   return new Promise(res => {
-    const child = spawn('codex', ['login'], { env, stdio: 'ignore' })
+    const child = spawn(CODEX, ['login'], { env, stdio: 'ignore' })
     child.on('error', () => res(false))
     child.on('close', code => res(code === 0))
   })
