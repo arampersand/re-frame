@@ -18,8 +18,8 @@ for (const arch of ['arm64', 'x64']) {
     return statSync(p).isDirectory() ? find(p, name) : (f === name ? [p] : [])
   })
   mkdirSync(out, { recursive: true })
-  // codex itself + ripgrep, which Codex uses to search the student's notes.
-  for (const name of ['codex', 'rg']) {
+  // codex, its code-mode host (how it reads/edits files) and ripgrep (search).
+  for (const name of ['codex', 'codex-code-mode-host', 'rg']) {
     const bin = find(join(tmp, 'package'), name)[0]
     if (!bin) throw new Error(`${name} not found for ${arch}`)
     copyFileSync(bin, join(out, name))
