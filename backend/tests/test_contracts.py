@@ -17,7 +17,7 @@ def test_seed_respects_contracts():
                         (Lecture, "lectures"), (ProposedAction, "actions"), (Receipt, "receipts")):
         for item in store.all(coll):
             model(**item)
-    for exp in store.all.__globals__["_state"]["canned_explanations"].values():
+    for exp in store.section("canned_explanations", {}).values():
         Explanation(**exp)
 
 

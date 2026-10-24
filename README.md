@@ -27,6 +27,15 @@ make desktop    # terminal 2 → abre la app
 Funciona **sin ninguna llave**: arranca con un semestre de demo ya cargado. Las
 llaves activan la transcripción real, el LLM y Google Calendar. Ver `.env.example`.
 
+### Llaves: cómo las repartimos
+- **Cada quien** saca su propia llave gratis en console.groq.com y la pone en
+  su `.env` como `GROQ_API_KEY`. Con eso funcionan el LLM y la transcripción.
+- **Anthropic** (opcional, mejores explicaciones): una sola llave del equipo,
+  compartida por mensaje privado. Nunca en el chat del grupo ni en git.
+- **Google Calendar:** solo en la máquina de la demo.
+- **No** las ponemos en Vercel ni detrás de un endpoint: una ruta que devuelve
+  llaves es pública para cualquiera que la encuentre.
+
 ## Cómo está hecho
 
 ```
@@ -57,6 +66,7 @@ Flujo de cada acción: **propuesta → permiso → acción → recibo**. Un reci
 - Si usas Claude Code o similar, el repo trae [CLAUDE.md](CLAUDE.md) con las reglas.
 - `make check` corre lo mismo que CI. Córrelo antes de cada PR.
 - Contexto del proyecto y guion de la demo: [docs/CONTEXT.md](docs/CONTEXT.md).
+- Recorrido del usuario y onboarding: [docs/USER-JOURNEY.md](docs/USER-JOURNEY.md).
 - Etapas y funciones deseadas: [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## API rápida
@@ -71,6 +81,7 @@ Flujo de cada acción: **propuesta → permiso → acción → recibo**. Un reci
 | POST | `/api/explain` | 4 representaciones + quiz |
 | POST | `/api/topics/{id}/quiz` | Resultado del quiz, actualiza el tema |
 | POST | `/api/ask` | Pregunta libre con guardia de integridad |
+| GET/POST | `/api/onboarding…` | Elicitación de 8 preguntas, reflexión y confirmación |
 | POST | `/api/demo/reset` | Vuelve al semestre de demo |
 
 Documentación interactiva en `http://127.0.0.1:8787/docs`.

@@ -105,6 +105,12 @@ def upsert(collection: str, item: dict) -> dict:
     return item
 
 
+def section(name: str, default: dict) -> dict:
+    """Sección libre del estado (p. ej. "onboarding"). La crea si no existe."""
+    _ensure()
+    return _state.setdefault(name, default)
+
+
 def canned_explanation(topic_id: str | None) -> dict | None:
     _ensure()
     return _state["canned_explanations"].get(topic_id or "")

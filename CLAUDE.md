@@ -1,8 +1,8 @@
 # Re-Frame — reglas para agentes de código (Claude, Cursor, Copilot)
 
-Lee esto completo antes de tocar código. Somos 7 personas trabajando en paralelo
+Lee esto completo antes de tocar código. Somos 5 personas trabajando en paralelo
 durante un hackathon de 3 días. Tu trabajo es avanzar el issue de tu humano
-**sin romper el de los otros seis**.
+**sin romper el de los otros cuatro**.
 
 ## Qué es Re-Frame
 Copiloto de escritorio para universitarios: escucha la clase, sabe qué entendiste
@@ -13,7 +13,7 @@ recibo. **Explica, nunca hace la tarea.** Contexto completo: `docs/CONTEXT.md`.
 ## Reglas duras
 1. **Solo toca los archivos del área del issue.** El mapa está en
    `CONTRIBUTING.md`. Si necesitas tocar otra área, detente y dile a tu humano.
-2. **`backend/app/contracts.py` es la API de los 7.** No renombres ni borres
+2. **`backend/app/contracts.py` es la API de los 5.** No renombres ni borres
    campos. Agregar un campo opcional está bien solo si el issue tiene la
    etiqueta `contract-change`. Después corre `make contracts`.
 3. **Nunca edites a mano** `contracts/schema.json` ni

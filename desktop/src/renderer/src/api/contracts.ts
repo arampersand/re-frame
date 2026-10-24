@@ -5,13 +5,20 @@ export interface ReFrameContracts {
   AskResponse?: AskResponse;
   Course?: Course;
   Deadline?: Deadline;
+  Evidence?: Evidence;
   ExplainRequest?: ExplainRequest;
   Explanation?: Explanation;
   Lecture?: Lecture;
+  OnboardingAnswer?: OnboardingAnswer;
+  OnboardingOption?: OnboardingOption;
+  OnboardingQuestion?: OnboardingQuestion;
+  OnboardingState?: OnboardingState;
+  Profile?: Profile;
   ProposedAction?: ProposedAction;
   QuizQuestion?: QuizQuestion;
   QuizResult?: QuizResult;
   Receipt?: Receipt;
+  Reflection?: Reflection;
   Segment?: Segment;
   Student?: Student;
   TodayView?: TodayView;
@@ -52,6 +59,12 @@ export interface Deadline {
   kind: "tarea" | "examen" | "proyecto" | "quiz";
   title: string;
   topic_ids: string[];
+}
+export interface Evidence {
+  confidence: number;
+  quote: string | null;
+  source: "imported" | "stated" | "inferred" | "measured";
+  value: string;
 }
 export interface ExplainRequest {
   lang?: ("es" | "en") | null;
@@ -98,6 +111,50 @@ export interface Segment {
   lecture_id: string;
   start_s: number;
   text: string;
+}
+export interface OnboardingAnswer {
+  option_id?: string | null;
+  question_id: string;
+  skipped?: boolean;
+  text?: string | null;
+}
+export interface OnboardingOption {
+  id: string;
+  label: string;
+}
+export interface OnboardingQuestion {
+  allow_skip: boolean;
+  id: string;
+  kind: "choice" | "text" | "scale" | "contrast";
+  options: OnboardingOption[];
+  prompt: string;
+  slot: string;
+  why: string;
+}
+export interface OnboardingState {
+  done: boolean;
+  next_question: OnboardingQuestion | null;
+  profile: Profile;
+  reflections: Reflection[];
+  step: number;
+  total_estimate: number;
+}
+/**
+ * Lo que Re-Frame entiende del estudiante. Llave = slot.
+ */
+export interface Profile {
+  confirmed: boolean;
+  slots: {
+    [k: string]: Evidence;
+  };
+}
+/**
+ * Una frase de "esto entendí de ti" que el estudiante confirma o corrige.
+ */
+export interface Reflection {
+  slot: string;
+  source: "imported" | "stated" | "inferred" | "measured";
+  statement: string;
 }
 export interface QuizResult {
   correct: number;

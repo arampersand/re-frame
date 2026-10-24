@@ -4,7 +4,7 @@ Cuatro etapas. Cada una termina con algo que se puede enseñar. Los issues de
 GitHub están etiquetados con su etapa (milestone).
 
 ## E0 · Arranque (hoy, primeras 2 horas)
-Meta: los 7 corren la app en su máquina y cada uno sabe su área.
+Meta: los 5 corren la app en su máquina y cada uno sabe su área.
 - Todos: `make setup`, `make backend`, `make desktop`. Ver la pantalla Hoy.
 - Integrador: repo, llaves compartidas, Google OAuth de la cuenta de demo.
 - Branding: nombre, logo y paleta inicial en `theme/tokens.css`.

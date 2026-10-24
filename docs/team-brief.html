@@ -101,8 +101,8 @@ footer{color:var(--muted);font-size:13px}
   <p class="lede">Escucha tu clase, detecta lo que no entendiste, te lo explica de cuatro formas y aparta en tu calendario el tiempo para repasarlo antes del examen. <strong>Explica, nunca hace la tarea.</strong></p>
   <div class="meta">
     <span class="chip on">App de escritorio · Electron</span>
-    <span class="chip">7 personas · 3 días</span>
-    <span class="chip">26 issues en 5 etapas</span>
+    <span class="chip">5 personas · 3 días</span>
+    <span class="chip">30 issues en 5 etapas</span>
     <span class="chip">Funciona sin llaves</span>
   </div>
 </header>
@@ -160,22 +160,20 @@ footer{color:var(--muted);font-size:13px}
   <div class="tbl"><table>
     <thead><tr><th>Rol</th><th>Quién</th><th>Qué entrega</th><th>Issues</th></tr></thead>
     <tbody>
-      <tr><td class="who">Integrador</td><td>Pedro</td><td>Llaves, Google de demo, contratos, merges, freeze, checklist de demo.</td><td class="mono">#2 #20</td></tr>
-      <tr><td class="who">Audio</td><td>Magio</td><td>Grabación por segmentos en Electron, transcripción bilingüe. Su Dictadito entra aquí.</td><td class="mono">#4 #5 #13</td></tr>
-      <tr><td class="who">Acciones</td><td>Bart</td><td>Google Calendar con recibo verificado, iCal de Blackboard, huecos reales.</td><td class="mono">#8 #11 #14</td></tr>
-      <tr><td class="who">Explicador</td><td>Persona 5</td><td>Cuatro representaciones confiables, guardia de integridad, syllabus.</td><td class="mono">#6 #7 #12</td></tr>
-      <tr><td class="who">Estado + frontend</td><td>Persona 6</td><td>Quiz que mueve el mapa, bilingüe, onboarding.</td><td class="mono">#9 #15 #16</td></tr>
-      <tr><td class="who">Datos de demo</td><td>Persona 7</td><td>Semestre completo, clip de clase grabado, video de respaldo.</td><td class="mono">#10 #19</td></tr>
-      <tr><td class="who">Branding y pitch</td><td>Vic</td><td>Nombre, paleta, logo, ícono, deck y video. Sin tareas de código.</td><td class="mono">#3 #17 #18</td></tr>
+      <tr><td class="who">Ary</td><td class="mono">@arampersand</td><td>Integrador: llaves, contratos, merges, freeze. Explicador y motor del onboarding.</td><td class="mono">#2 #6 #7 #12 #20 #29</td></tr>
+      <tr><td class="who">Magio</td><td class="mono">@magiobus</td><td>Grabación y transcripción bilingüe, mapa de temas, pantalla de onboarding, interfaz bilingüe.</td><td class="mono">#4 #5 #9 #13 #15 #16</td></tr>
+      <tr><td class="who">Bart</td><td class="mono">@yosoybartsolo</td><td>Google Calendar con recibo, iCal de Blackboard, huecos reales. Lleva el pitch.</td><td class="mono">#8 #11 #14 #18</td></tr>
+      <tr><td class="who">Leo</td><td class="mono">@leo12L</td><td>Semestre de demo, clip de clase, preguntas del onboarding y pruebas como estudiante. Sin código.</td><td class="mono">#10 #19 #27 #28</td></tr>
+      <tr><td class="who">Vic</td><td class="mono">pendiente</td><td>Nombre, paleta, logo, ícono, landing y diseño del deck. Sin código.</td><td class="mono">#3 #17 #18</td></tr>
     </tbody>
   </table></div>
-  <p class="light" style="font-size:14px">Issue #1 es para los 7: correr la app y comentar “listo”.</p>
+  <p class="light" style="font-size:14px">Issue #1 es para los 5: correr la app y comentar “listo”.</p>
 </section>
 
 <section>
   <h2>Etapas</h2>
   <div class="stages">
-    <div class="stage s0"><span class="when">E0 · hoy, 2 h</span><h3>Arranque</h3><ul><li>Los 7 corren la app</li><li>Llaves y Google</li><li>Branding v0</li></ul></div>
+    <div class="stage s0"><span class="when">E0 · hoy, 2 h</span><h3>Arranque</h3><ul><li>Los 5 corren la app</li><li>Llaves y Google</li><li>Branding v0</li></ul></div>
     <div class="stage s1"><span class="when">E1 · día 1</span><h3>Corte vertical real</h3><ul><li>Grabar y transcribir</li><li>Explicador con LLM</li><li>Quiz mueve temas</li><li>Calendar con recibo</li></ul></div>
     <div class="stage s2"><span class="when">E2 · día 2</span><h3>Producto</h3><ul><li>iCal y syllabus</li><li>Tema por segmento</li><li>ES / EN</li><li>Onboarding</li></ul></div>
     <div class="stage s3"><span class="when">E3 · día 3</span><h3>Demo</h3><ul><li>Branding final</li><li>Freeze 12:00</li><li>Video y deck</li><li>5 ensayos</li></ul></div>
@@ -187,7 +185,7 @@ footer{color:var(--muted);font-size:13px}
   <p class="sub">Aplican igual a ti y a tu Claude. El repo trae CLAUDE.md con esto mismo para los agentes.</p>
   <div class="rules">
     <div class="rule"><h3>Solo tu área</h3><p>El mapa de archivos por área está en CONTRIBUTING.md. Pídele a tu agente que lo lea antes de empezar.</p></div>
-    <div class="rule"><h3>Los contratos son de los 7</h3><p><code>backend/app/contracts.py</code> define todo lo que viaja entre backend y app. Agregar un campo opcional, sí. Renombrar o borrar, con issue y el integrador.</p></div>
+    <div class="rule"><h3>Los contratos son de los 5</h3><p><code>backend/app/contracts.py</code> define todo lo que viaja entre backend y app. Agregar un campo opcional, sí. Renombrar o borrar, con issue y el integrador.</p></div>
     <div class="rule"><h3>Ramas y PR, nunca main</h3><p>Rama <code>nombre/numero-tema</code>, PR chico, una aprobación, squash merge. Después todos hacen pull.</p></div>
     <div class="rule"><h3>make check antes del PR</h3><p>Corre pruebas, verifica contratos, typecheck y build. Es exactamente lo que corre CI.</p></div>
     <div class="rule"><h3>Default alive</h3><p>La app tiene que hacer la demo completa sin ninguna llave. Todo lo que llame a un servicio necesita respaldo.</p></div>
@@ -199,7 +197,7 @@ footer{color:var(--muted);font-size:13px}
 
 <section>
   <h2>Arrancar en tu máquina</h2>
-  <p class="sub">Necesitas Python 3.12+, Node 22+ y acceso al repo <span class="mono">arampersand/re-frame</span>. Pídele a Pedro la invitación.</p>
+  <p class="sub">Necesitas Python 3.12+, Node 22+ y acceso al repo <span class="mono">arampersand/re-frame</span>. Pídele a Ary o a Magio la invitación.</p>
   <pre id="setup"><span class="c"># una vez</span>
 gh repo clone arampersand/re-frame && cd re-frame
 make setup
@@ -214,11 +212,11 @@ make desktop</pre>
 
 <section>
   <h2>Variables de entorno</h2>
-  <p class="sub">En <code>.env</code> en la raíz. Con ninguna, la demo corre con datos de respaldo. Las llaves se pasan por chat privado, nunca por git.</p>
+  <p class="sub">En <code>.env</code> en la raíz de tu copia del repo. Cada quien saca su propia llave gratis de Groq en <span class="mono">console.groq.com</span> y con eso funciona todo. La llave de Anthropic, si la usamos, Ary la pasa por mensaje privado. Nunca en git, en Vercel ni en un endpoint.</p>
   <div class="tbl"><table>
     <thead><tr><th>Variable</th><th>Para qué</th><th>Quién</th></tr></thead>
     <tbody>
-      <tr><td class="mono">GROQ_API_KEY</td><td>LLM y transcripción gratis. Con esta sola ya funciona todo lo de IA.</td><td><span class="tag req">recomendada</span></td></tr>
+      <tr><td class="mono">GROQ_API_KEY</td><td>LLM y transcripción gratis. Con esta sola ya funciona todo lo de IA. Cada quien saca la suya.</td><td><span class="tag req">cada quien</span></td></tr>
       <tr><td class="mono">ANTHROPIC_API_KEY</td><td>Mejores explicaciones. Primera en el failover.</td><td><span class="tag opt">opcional</span></td></tr>
       <tr><td class="mono">OPENAI_API_KEY</td><td>Whisper para transcribir, y LLM de último respaldo.</td><td><span class="tag opt">opcional</span></td></tr>
       <tr><td class="mono">GEMINI_API_KEY</td><td>Otro respaldo de LLM.</td><td><span class="tag opt">opcional</span></td></tr>

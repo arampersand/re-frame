@@ -545,5 +545,122 @@
         }
       ]
     }
+  },
+  "onboarding": {
+    "answered": {
+      "goal": {
+        "question_id": "goal",
+        "option_id": null,
+        "text": null,
+        "skipped": false
+      },
+      "stake": {
+        "question_id": "stake",
+        "option_id": null,
+        "text": null,
+        "skipped": false
+      },
+      "work": {
+        "question_id": "work",
+        "option_id": null,
+        "text": null,
+        "skipped": false
+      },
+      "window": {
+        "question_id": "window",
+        "option_id": null,
+        "text": null,
+        "skipped": false
+      },
+      "episode": {
+        "question_id": "episode",
+        "option_id": null,
+        "text": null,
+        "skipped": false
+      },
+      "contrast": {
+        "question_id": "contrast",
+        "option_id": null,
+        "text": null,
+        "skipped": false
+      },
+      "lang": {
+        "question_id": "lang",
+        "option_id": null,
+        "text": null,
+        "skipped": false
+      },
+      "worry": {
+        "question_id": "worry",
+        "option_id": null,
+        "text": null,
+        "skipped": false
+      }
+    },
+    "profile": {
+      "confirmed": true,
+      "slots": {
+        "goal": {
+          "value": "Pasar Estructuras de Datos con A y conseguir internship de backend",
+          "source": "stated",
+          "confidence": 0.9,
+          "quote": "quiero sacar A en estructuras y entrar a un internship de backend"
+        },
+        "stake": {
+          "value": "Mantener la beca, que exige promedio de 3.0",
+          "source": "stated",
+          "confidence": 0.85,
+          "quote": "si bajo de 3.0 pierdo la beca"
+        },
+        "work_hours": {
+          "value": "16-30",
+          "source": "stated",
+          "confidence": 0.9,
+          "quote": "16 a 30"
+        },
+        "block_minutes": {
+          "value": "25",
+          "source": "inferred",
+          "confidence": 0.7,
+          "quote": "16 a 30"
+        },
+        "study_window": {
+          "value": "night",
+          "source": "stated",
+          "confidence": 0.9,
+          "quote": "En la noche"
+        },
+        "help_style": {
+          "value": "Busca videos en YouTube y lo deja si no encuentra",
+          "source": "stated",
+          "confidence": 0.7,
+          "quote": "busqué en youtube pero no le entendí y lo dejé"
+        },
+        "representation": {
+          "value": "diagram",
+          "source": "measured",
+          "confidence": 0.8,
+          "quote": "Un dibujo"
+        },
+        "think_lang": {
+          "value": "mix",
+          "source": "stated",
+          "confidence": 0.9,
+          "quote": "Una mezcla"
+        },
+        "explain_lang": {
+          "value": "es",
+          "source": "inferred",
+          "confidence": 0.7,
+          "quote": "Una mezcla"
+        },
+        "worry_course": {
+          "value": "c_ed",
+          "source": "stated",
+          "confidence": 0.9,
+          "quote": "Estructuras de Datos"
+        }
+      }
+    }
   }
 }

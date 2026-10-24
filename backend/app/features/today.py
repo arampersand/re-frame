@@ -13,6 +13,7 @@ from fastapi import APIRouter, HTTPException
 
 from app import store
 from app.config import settings
+from app.features import onboarding
 from app.contracts import Deadline, ProposedAction, Receipt, TodayView, Topic
 from app.tools.calendar_tool import calendar_tool
 
@@ -37,11 +38,18 @@ def _overlaps(a0, a1, b0, b1) -> bool:
     return a0 < b1 and b0 < a1
 
 
+def _window() -> tuple[time, time]:
+    """La ventana que el estudiante eligió en el onboarding, o la default."""
+    w = onboarding.study_window()
+    return (time(w[0]), time(w[1])) if w else STUDY_WINDOW
+
+
 def _next_slot(after: datetime, minutes: int, taken: list[tuple[datetime, datetime]]) -> datetime:
     day = after.date()
+    w0, w1 = _window()
     for _ in range(HORIZON_DAYS):
-        start = datetime.combine(day, STUDY_WINDOW[0], _tz())
-        end_window = datetime.combine(day, STUDY_WINDOW[1], _tz())
+        start = datetime.combine(day, w0, _tz())
+        end_window = datetime.combine(day, w1, _tz())
         start = max(start, after)
         while start + timedelta(minutes=minutes) <= end_window:
             end = start + timedelta(minutes=minutes)
@@ -74,7 +82,10 @@ def plan(now: datetime, busy: list[tuple[datetime, datetime]]) -> list[ProposedA
         if not weak:
             continue
         t = weak[0]
+        # Laguna = bloque completo; si trabaja, el onboarding lo acorta.
         minutes = MINUTES[t["status"]]
+        if (cap := onboarding.block_minutes()):
+            minutes = min(minutes, cap) if t["status"] != "laguna" else max(cap, 25)
         start = _next_slot(now + timedelta(minutes=30), minutes, taken)
         end = start + timedelta(minutes=minutes)
         if end > _parse(d["due_at"]):

@@ -1,6 +1,6 @@
 // Único punto de contacto con el backend. Si cambias una ruta aquí, cámbiala en backend también.
 import type {
-  AskResponse, Course, Explanation, ExplainRequest, Lecture, ProposedAction,
+  AskResponse, Course, OnboardingAnswer, OnboardingState, Explanation, ExplainRequest, Lecture, ProposedAction,
   QuizResult, Receipt, Segment, Student, TodayView, Topic
 } from './contracts'
 
@@ -38,5 +38,10 @@ export const api = {
     post<Segment>(`/api/lectures/${lectureId}/segments/${segId}/confused${topicId ? `?topic_id=${topicId}` : ''}`),
   explain: (body: ExplainRequest) => post<Explanation>('/api/explain', body),
   ask: (text: string) => post<AskResponse>('/api/ask', { text }),
+  onboarding: () => req<OnboardingState>('/api/onboarding'),
+  onboardingStart: () => post<OnboardingState>('/api/onboarding/start'),
+  onboardingAnswer: (a: OnboardingAnswer) => post<OnboardingState>('/api/onboarding/answer', a),
+  onboardingConfirm: (corrections: Record<string, string> = {}) =>
+    post<OnboardingState>('/api/onboarding/confirm', { corrections }),
   reset: () => post<{ ok: boolean }>('/api/demo/reset')
 }

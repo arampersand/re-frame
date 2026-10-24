@@ -1,4 +1,4 @@
-# Cómo trabajamos los 7 sin estorbarnos
+# Cómo trabajamos los 5 sin estorbarnos
 
 ## El flujo
 1. Toma un issue y asígnatelo. Si no hay issue, créalo antes de programar.
@@ -11,16 +11,16 @@
 
 ## Mapa de áreas: quién toca qué
 
-| Área | Backend | Desktop |
-|---|---|---|
-| Audio | `app/audio/`, `features/lectures.py` | `features/lecture/useRecorder.ts` |
-| Explicador | `features/explain.py`, `features/ask.py`, `integrity.py` | `features/explain/` |
-| Estado por tema | `features/topics.py` | `features/topics/` |
-| Acciones | `features/today.py`, `tools/`, `features/ingest.py` | `features/today/`, `features/receipts/` |
-| Datos de demo | `seed/` | — |
-| Frontend y layout | — | `components/`, `features/lecture/LectureScreen.tsx` |
-| Branding (Vic) | — | `theme/tokens.css`, `branding/`, `desktop/resources/` |
-| Integrador | `contracts.py`, `main.py`, `store.py`, `config.py` | `App.tsx`, `api/` |
+| Quién | Área | Backend | Desktop |
+|---|---|---|---|
+| Ary `@arampersand` | Integrador, Explicador, motor de onboarding | `contracts.py`, `main.py`, `store.py`, `config.py`, `features/explain.py`, `features/ask.py`, `integrity.py`, `features/onboarding.py` | `App.tsx`, `api/`, `features/explain/` |
+| Magio `@magiobus` | Audio, estado por tema, frontend | `app/audio/`, `features/lectures.py`, `features/topics.py` | `features/lecture/`, `features/topics/`, `features/onboarding/`, `components/` |
+| Bart `@yosoybartsolo` | Acciones y pitch | `features/today.py`, `tools/`, `features/ingest.py` | `features/today/`, `features/receipts/` |
+| Leo `@leo12L` | Datos de demo, preguntas del onboarding, pruebas de usuario | `seed/`, textos de `BANK` en `features/onboarding.py` | — |
+| Vic | Branding y diseño del pitch | — | `theme/tokens.css`, `branding/`, `landing/` |
+
+Leo y Vic no necesitan programar. Leo edita JSON y textos; Vic edita colores y
+archivos de diseño. Si algo requiere código, lo piden en su issue.
 
 Archivos compartidos (`contracts.py`, `main.py`, `App.tsx`, `api/client.ts`):
 cambios mínimos, de una línea si se puede, y avisas en el chat del equipo.

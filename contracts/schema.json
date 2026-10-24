@@ -132,6 +132,46 @@
       "title": "Deadline",
       "type": "object"
     },
+    "Evidence": {
+      "properties": {
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "quote": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "source": {
+          "enum": [
+            "imported",
+            "stated",
+            "inferred",
+            "measured"
+          ],
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "source",
+        "confidence",
+        "quote"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
     "ExplainRequest": {
       "properties": {
         "lang": {
@@ -297,6 +337,174 @@
         "segments"
       ],
       "title": "Lecture",
+      "type": "object"
+    },
+    "OnboardingAnswer": {
+      "properties": {
+        "option_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "question_id": {
+          "type": "string"
+        },
+        "skipped": {
+          "default": false,
+          "type": "boolean"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "question_id"
+      ],
+      "title": "OnboardingAnswer",
+      "type": "object"
+    },
+    "OnboardingOption": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label"
+      ],
+      "title": "OnboardingOption",
+      "type": "object"
+    },
+    "OnboardingQuestion": {
+      "properties": {
+        "allow_skip": {
+          "default": true,
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "choice",
+            "text",
+            "scale",
+            "contrast"
+          ],
+          "type": "string"
+        },
+        "options": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/OnboardingOption"
+          },
+          "type": "array"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "slot": {
+          "type": "string"
+        },
+        "why": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "slot",
+        "kind",
+        "prompt",
+        "why",
+        "options",
+        "allow_skip"
+      ],
+      "title": "OnboardingQuestion",
+      "type": "object"
+    },
+    "OnboardingState": {
+      "properties": {
+        "done": {
+          "default": false,
+          "type": "boolean"
+        },
+        "next_question": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OnboardingQuestion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "profile": {
+          "$ref": "#/$defs/Profile"
+        },
+        "reflections": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Reflection"
+          },
+          "type": "array"
+        },
+        "step": {
+          "type": "integer"
+        },
+        "total_estimate": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "step",
+        "total_estimate",
+        "next_question",
+        "profile",
+        "reflections",
+        "done"
+      ],
+      "title": "OnboardingState",
+      "type": "object"
+    },
+    "Profile": {
+      "description": "Lo que Re-Frame entiende del estudiante. Llave = slot.",
+      "properties": {
+        "confirmed": {
+          "default": false,
+          "type": "boolean"
+        },
+        "slots": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "default": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "slots",
+        "confirmed"
+      ],
+      "title": "Profile",
       "type": "object"
     },
     "ProposedAction": {
@@ -504,6 +712,33 @@
         "created_at"
       ],
       "title": "Receipt",
+      "type": "object"
+    },
+    "Reflection": {
+      "description": "Una frase de \"esto entendí de ti\" que el estudiante confirma o corrige.",
+      "properties": {
+        "slot": {
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "imported",
+            "stated",
+            "inferred",
+            "measured"
+          ],
+          "type": "string"
+        },
+        "statement": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "slot",
+        "statement",
+        "source"
+      ],
+      "title": "Reflection",
       "type": "object"
     },
     "Segment": {
@@ -719,6 +954,9 @@
     "Deadline": {
       "$ref": "#/$defs/Deadline"
     },
+    "Evidence": {
+      "$ref": "#/$defs/Evidence"
+    },
     "ExplainRequest": {
       "$ref": "#/$defs/ExplainRequest"
     },
@@ -727,6 +965,21 @@
     },
     "Lecture": {
       "$ref": "#/$defs/Lecture"
+    },
+    "OnboardingAnswer": {
+      "$ref": "#/$defs/OnboardingAnswer"
+    },
+    "OnboardingOption": {
+      "$ref": "#/$defs/OnboardingOption"
+    },
+    "OnboardingQuestion": {
+      "$ref": "#/$defs/OnboardingQuestion"
+    },
+    "OnboardingState": {
+      "$ref": "#/$defs/OnboardingState"
+    },
+    "Profile": {
+      "$ref": "#/$defs/Profile"
     },
     "ProposedAction": {
       "$ref": "#/$defs/ProposedAction"
@@ -739,6 +992,9 @@
     },
     "Receipt": {
       "$ref": "#/$defs/Receipt"
+    },
+    "Reflection": {
+      "$ref": "#/$defs/Reflection"
     },
     "Segment": {
       "$ref": "#/$defs/Segment"

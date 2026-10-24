@@ -1,6 +1,6 @@
 """Contratos compartidos entre backend y desktop. FUENTE DE VERDAD.
 
-Regla de equipo: cambiar este archivo es cambiar la API de los 7.
+Regla de equipo: cambiar este archivo es cambiar la API de los 5.
 - Solo con issue etiquetado `contract-change` y aprobación del integrador.
 - Después de cambiarlo: `make contracts` regenera `contracts/schema.json` y
   `desktop/src/renderer/src/api/contracts.ts`. CI falla si no lo hiciste.
@@ -175,12 +175,75 @@ class AskResponse(Contract):
     suggested_action: ProposedAction | None = None
 
 
+# ---------- Onboarding: elicitación avanzada del perfil ----------
+# Cada dato del perfil guarda DE DÓNDE salió y qué tan seguros estamos.
+# Lo medido le gana a lo declarado; lo declarado le gana a lo inferido.
+
+EvidenceSource = Literal["imported", "stated", "inferred", "measured"]
+
+
+class Evidence(Contract):
+    value: str
+    source: EvidenceSource
+    confidence: float = Field(ge=0.0, le=1.0)
+    quote: str | None = None  # frase del estudiante que lo respalda
+
+
+class Profile(Contract):
+    """Lo que Re-Frame entiende del estudiante. Llave = slot."""
+    slots: dict[str, Evidence] = {}
+    confirmed: bool = False  # el estudiante vio la reflexión y la aprobó
+
+
+QuestionKind = Literal["choice", "text", "scale", "contrast"]
+
+
+class OnboardingOption(Contract):
+    id: str
+    label: str
+
+
+class OnboardingQuestion(Contract):
+    id: str
+    slot: str
+    kind: QuestionKind
+    prompt: str
+    why: str  # "por qué te pregunto esto", siempre visible
+    options: list[OnboardingOption] = []
+    allow_skip: bool = True
+
+
+class OnboardingAnswer(Contract):
+    question_id: str
+    option_id: str | None = None
+    text: str | None = None
+    skipped: bool = False
+
+
+class Reflection(Contract):
+    """Una frase de "esto entendí de ti" que el estudiante confirma o corrige."""
+    slot: str
+    statement: str
+    source: EvidenceSource
+
+
+class OnboardingState(Contract):
+    step: int
+    total_estimate: int
+    next_question: OnboardingQuestion | None = None
+    profile: Profile
+    reflections: list[Reflection] = []
+    done: bool = False
+
+
 # Modelos que el desktop ENVÍA (se exportan con defaults opcionales).
-REQUESTS = [ExplainRequest, QuizResult, AskRequest]
+REQUESTS = [ExplainRequest, QuizResult, AskRequest, OnboardingAnswer]
 
 # Modelos exportados a JSON Schema / TypeScript. Agrega aquí los nuevos.
 EXPORTED = [
     Student, Course, Deadline, Segment, Lecture, QuizQuestion, Explanation,
     ExplainRequest, Topic, QuizResult, ProposedAction, Receipt, TodayView,
     AskRequest, AskResponse,
+    Evidence, Profile, OnboardingOption, OnboardingQuestion, OnboardingAnswer,
+    Reflection, OnboardingState,
 ]
