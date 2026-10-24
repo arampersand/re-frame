@@ -195,9 +195,9 @@
 
 <script>
   // ---- Downloads: set DOWNLOAD_BASE to the public R2 URL once uploaded ----
-  const DOWNLOAD_BASE = '';
+  const DOWNLOAD_BASE = '/download';
   const VERSION = '0.2.0';
-  const files = { arm64: `MyBrainBook-${VERSION}-arm64.dmg`, x64: `MyBrainBook-${VERSION}-x64.dmg` };
+  const files = { arm64: 'arm64', x64: 'x64' };
 
   function isAppleSilicon() {
     try {
