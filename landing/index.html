@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Re-Frame</title>
+<meta name="description" content="Re-Frame escucha tu clase, detecta lo que no entendiste, te lo explica de cuatro formas y aparta el tiempo para repasarlo antes del examen.">
+<meta property="og:title" content="Re-Frame">
+<meta property="og:description" content="Lo que no entendiste a las 10:45, entendido antes del examen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M3 11V3h8M21 3h8v8M29 21v8h-8M11 29H3v-8' fill='none' stroke='%235b3fe0' stroke-width='3.5'/%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f4f5fa; --surface:#ffffff; --surface-2:#eceef6; --line:#dcdfe9;
+  --ink:#12141b; --muted:#5c6275; --accent:#5b3fe0; --accent-soft:#e9e4ff; --accent-ink:#ffffff;
+  --ok:#1e9e5a; --warn:#c98a0a; --gap:#d64545; --unseen:#9aa0b0;
+  --display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;
+  --body:'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme:dark){:root{
+  color-scheme:dark;--bg:#0e1015;--surface:#161922;--surface-2:#1e2230;--line:#2a2f3d;
+  --ink:#ebedf3;--muted:#9aa1b2;--accent:#9a85ff;--accent-soft:#251f45;--accent-ink:#0e1015;
+  --ok:#2fbf71;--warn:#f2b632;--gap:#ef5b5b;--unseen:#5f6678}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--body);padding-inline:20px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+
+/* the frame motif: four corner brackets, like a viewfinder */
+.frame{position:relative;display:inline-block;padding:.04em .2em;--w:max(3px,.07em);--s:.3em}
+.frame::before,.frame::after,.frame>.c1,.frame>.c2{content:"";position:absolute;width:var(--s);height:var(--s);border:0 solid var(--accent)}
+.frame::before{top:0;left:0;border-top-width:var(--w);border-left-width:var(--w)}
+.frame>.c1{top:0;right:0;border-top-width:var(--w);border-right-width:var(--w)}
+.frame>.c2{bottom:0;left:0;border-bottom-width:var(--w);border-left-width:var(--w)}
+.frame::after{bottom:0;right:0;border-bottom-width:var(--w);border-right-width:var(--w)}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding-block:20px;gap:16px}
+.brand{font:800 20px/1 var(--display);letter-spacing:-.02em;text-decoration:none;display:flex;align-items:center;gap:8px}
+.brand svg{width:22px;height:22px}
+.navr{display:flex;gap:10px;align-items:center}
+.lang{font:500 12px/1 var(--mono);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 11px;cursor:pointer}
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 15px/1 var(--body);padding:13px 18px;border-radius:10px;text-decoration:none;border:1px solid transparent;cursor:pointer}
+.btn.pri{background:var(--accent);color:var(--accent-ink)}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.sec{border-color:var(--line);background:var(--surface)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:48px;align-items:center;padding-block:40px 72px}
+.eyebrow{font:500 12px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font:800 clamp(40px,6.2vw,72px)/.98 var(--display);letter-spacing:-.035em;margin:14px 0 20px;text-wrap:balance}
+h1 .frame{color:var(--accent)}
+.lede{font-size:19px;color:var(--muted);max-width:44ch;margin:0 0 28px}
+.lede b{color:var(--ink);font-weight:600}
+.ctas{display:flex;flex-wrap:wrap;gap:10px}
+
+/* live reframe widget */
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 30px 60px -30px rgb(20 16 60 / .25);display:flex;flex-direction:column;gap:14px}
+.bar{display:flex;align-items:center;gap:8px;font:500 12px var(--mono);color:var(--muted)}
+.rec{width:8px;height:8px;border-radius:50%;background:var(--gap);animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.line{display:flex;gap:10px;font-size:14.5px;line-height:1.5;color:var(--muted)}
+.line time{font:12px/1.9 var(--mono);flex:none;color:var(--unseen)}
+.line.hit{color:var(--ink)}
+.line.hit .txt{background:linear-gradient(transparent 62%,var(--accent-soft) 62%)}
+.tag{font:500 10.5px var(--mono);color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px;margin-right:4px}
+.reframe{border-top:1px dashed var(--line);padding-top:14px;display:flex;flex-direction:column;gap:10px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tabs button{font:500 12.5px var(--body);border:0;background:none;color:var(--muted);padding:5px 10px;border-radius:7px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.panel{min-height:150px;background:var(--surface-2);border-radius:12px;padding:14px 16px;font-size:14px;display:flex;align-items:center}
+.panel>div{width:100%}
+.panel[data-k] > div{animation:in .45s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.tree{display:flex;align-items:center;justify-content:space-around;gap:10px;font:500 12px var(--mono)}
+.n{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--ink);display:grid;place-items:center;background:var(--surface)}
+.n.up{border-color:var(--accent);color:var(--accent)}
+.chain{display:flex;align-items:center;gap:4px}
+.chain i{width:12px;height:1.5px;background:var(--ink)}
+.bal{display:flex;flex-direction:column;align-items:center;gap:8px}
+.bal .kids{display:flex;gap:18px}
+.arrow{color:var(--muted);font-size:20px}
+.mono{font-family:var(--mono);font-size:13px;line-height:1.7}
+.sum{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.result{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:13.5px}
+.pill{display:inline-flex;align-items:center;gap:6px;font:500 12px var(--mono);padding:4px 9px;border-radius:999px;background:var(--surface-2)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+/* sections */
+section{padding-block:72px;border-top:1px solid var(--line)}
+h2{font:800 clamp(30px,4.2vw,46px)/1.04 var(--display);letter-spacing:-.03em;margin:10px 0 14px;text-wrap:balance;max-width:20ch}
+.intro{color:var(--muted);font-size:18px;max-width:58ch;margin:0 0 40px}
+
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.trio h3{font:600 26px/1.1 var(--display);margin:0 0 8px;letter-spacing:-.02em}
+.trio h3 .frame{font-size:1em}
+.trio p{margin:0;color:var(--muted)}
+.k{font:500 12px var(--mono);color:var(--accent);margin-bottom:8px;display:block}
+
+.flow{display:grid;grid-template-columns:repeat(6,1fr);gap:0;counter-reset:f}
+.step{position:relative;padding:18px 14px 0 0;border-top:2px solid var(--line);counter-increment:f}
+.step::before{content:counter(f,decimal-leading-zero);position:absolute;top:-12px;left:0;background:var(--bg);padding-right:8px;font:500 12px var(--mono);color:var(--accent)}
+.step h4{margin:0 0 6px;font:600 16px/1.25 var(--body)}
+.step p{margin:0;font-size:14px;color:var(--muted)}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.chat{display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px}
+.msg{max-width:88%;padding:12px 14px;border-radius:14px;font-size:15px}
+.msg.me{align-self:flex-end;background:var(--ink);color:var(--bg);border-bottom-right-radius:4px}
+.msg.rf{background:var(--surface-2);border-bottom-left-radius:4px}
+.msg ol{margin:8px 0 0;padding-left:20px;font-size:14px;color:var(--muted)}
+.msg .blk{margin-top:10px;font:500 12px var(--mono);color:var(--accent)}
+
+.map{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.course{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.course h4{margin:0 0 10px;font:600 14px var(--body)}
+.topic{display:grid;grid-template-columns:10px 1fr 44px;gap:10px;align-items:center;font-size:13.5px;padding-block:4px}
+.topic span:last-child{font:12px var(--mono);color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:16px;font:12px var(--mono);color:var(--muted)}
+
+.receipt{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;font:13.5px/1.8 var(--mono);position:relative;overflow:hidden}
+.receipt::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:12px;background:radial-gradient(circle at 6px 0,var(--bg) 5px,transparent 6px) 0 0/12px 12px repeat-x}
+.receipt b{font-weight:500;color:var(--ok)}
+.receipt .r{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed var(--line)}
+.receipt .r:last-of-type{border:0}
+.receipt .r span:first-child{color:var(--muted)}
+
+.ep{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.ep div{background:var(--surface);padding:22px}
+.ep strong{display:block;font:600 18px/1.25 var(--display);margin-bottom:6px}
+.ep p{margin:0;color:var(--muted);font-size:15px}
+
+.closing{text-align:left;padding-block:88px}
+.closing h2{max-width:16ch;font-size:clamp(36px,5.6vw,64px)}
+footer{border-top:1px solid var(--line);padding-block:28px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font:13px var(--mono);color:var(--muted)}
+
+@media (max-width:900px){
+  .hero,.split{grid-template-columns:1fr}
+  .flow{grid-template-columns:repeat(3,1fr);row-gap:32px}
+  .trio,.ep{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .flow{grid-template-columns:1fr 1fr}
+  .map{grid-template-columns:1fr}
+  .btn.sec.hide-s{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <a class="brand" href="#">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 11V3h8M21 3h8v8M29 21v8h-8M11 29H3v-8" fill="none" stroke="var(--accent)" stroke-width="3.5"/></svg>
+    Re-Frame
+  </a>
+  <div class="navr">
+    <button class="lang" id="lang" type="button" aria-label="Cambiar idioma">EN</button>
+    <a class="btn sec hide-s" href="#como" data-en="How it works">Cómo funciona</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div>
+    <span class="eyebrow" data-en="For university students · El Paso">Para universitarios · El Paso</span>
+    <h1><span data-en="What you missed at 10:45,">Lo que no entendiste a las 10:45,</span> <span class="frame"><span class="c1"></span><span class="c2"></span><span data-en="understood">entendido</span></span> <span data-en="before the exam.">antes del examen.</span></h1>
+    <p class="lede"><span data-en="Re-Frame listens to your lecture, catches what didn't land, explains it four different ways and books the time to review it.">Re-Frame escucha tu clase, detecta lo que no te quedó, te lo explica de cuatro formas y aparta el tiempo para repasarlo.</span> <b data-en="It explains. It never does your homework.">Explica. Nunca hace tu tarea.</b></p>
+    <div class="ctas">
+      <a class="btn pri" href="#como" data-en="See how it works">Ver cómo funciona</a>
+      <a class="btn sec" href="#tarea" data-en="The homework rule">La regla de la tarea</a>
+    </div>
+  </div>
+
+  <div class="stage" aria-label="Demostración: una frase de clase explicada de cuatro formas">
+    <div class="bar"><span class="rec"></span><span data-en="Data Structures · recording">Estructuras de Datos · grabando</span><span style="margin-left:auto">01:52</span></div>
+    <div class="line"><time>1:15</time><span data-en="In the right-right case we do a single left rotation.">En el caso derecha-derecha hacemos una rotación simple a la izquierda.</span></div>
+    <div class="line"><time>1:30</time><span><span class="tag">EN</span>In the left-right case you need a double rotation.</span></div>
+    <div class="line hit"><time>1:45</time><span class="txt" data-en="The left subtree of the node that moves up becomes the right subtree of the one that moves down.">El subárbol izquierdo del nodo que sube se convierte en el subárbol derecho del que baja.</span></div>
+    <div class="reframe">
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-k="d" data-en="Diagram">Diagrama</button>
+        <button role="tab" aria-selected="false" data-k="a" data-en="Analogy">Analogía</button>
+        <button role="tab" aria-selected="false" data-k="e" data-en="Example">Ejemplo</button>
+        <button role="tab" aria-selected="false" data-k="s" data-en="Summary">Resumen</button>
+      </div>
+      <div class="panel" id="panel" data-k="d" role="tabpanel"></div>
+      <div class="result">
+        <span class="pill"><span class="dot" style="background:var(--gap)"></span><span data-en="AVL rotations · 31%">Rotaciones AVL · 31 %</span></span>
+        <span style="color:var(--muted)" data-en="Quiz: 2 of 3">Quiz: 2 de 3</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <span class="eyebrow" data-en="Not another chatbot">No es otro chatbot</span>
+  <h2 data-en="It knows, it acts, and it proves it.">Sabe, hace y lo comprueba.</h2>
+  <p class="intro" data-en="The AI you already use answers questions. It doesn't know what your professor said on Tuesday, what you got wrong, or when your exam is.">La IA que ya usas contesta preguntas. No sabe lo que dijo tu profe el martes, qué fallaste ni cuándo es tu examen.</p>
+  <div class="trio">
+    <div><span class="k" data-en="knows">sabe</span><h3 data-en="Your semester, already loaded">Tu semestre, ya cargado</h3><p data-en="Every lecture transcribed, every topic with its state, every deadline on the map. You don't explain anything.">Cada clase transcrita, cada tema con su estado, cada entrega en el mapa. No le explicas nada.</p></div>
+    <div><span class="k" data-en="acts">hace</span><h3 data-en="It books the review">Agenda el repaso</h3><p data-en="It proposes the block, you approve with one click, and it lands in Google Calendar.">Propone el bloque, apruebas con un clic y queda en tu Google Calendar.</p></div>
+    <div><span class="k" data-en="proves">comprueba</span><h3 data-en="With a receipt">Con recibo</h3><p data-en="It reads the event back from Google. If there's no receipt, it didn't happen.">Vuelve a leer el evento en Google. Si no hay recibo, no pasó.</p></div>
+  </div>
+</section>
+
+<section id="como">
+  <span class="eyebrow" data-en="How it works">Cómo funciona</span>
+  <h2 data-en="From lecture to calendar, in one loop.">De la clase al calendario, en un solo ciclo.</h2>
+  <p class="intro" data-en="Built on the three things every student needs: know what you know, find what you're stuck on, decide what to study next.">Hecho sobre lo que todo estudiante necesita: saber qué sabe, encontrar dónde se atora y decidir qué estudiar después.</p>
+  <div class="flow">
+    <div class="step"><h4 data-en="Lecture">Clase</h4><p data-en="Records and transcribes, Spanish and English mixed.">Graba y transcribe, español e inglés mezclados.</p></div>
+    <div class="step"><h4 data-en="“Didn't get it”">“No entendí”</h4><p data-en="Tap the exact sentence that lost you.">Tocas la frase exacta donde te perdiste.</p></div>
+    <div class="step"><h4 data-en="Four ways">Cuatro formas</h4><p data-en="Diagram, analogy, worked example and summary.">Diagrama, analogía, ejemplo resuelto y resumen.</p></div>
+    <div class="step"><h4>Quiz</h4><p data-en="Three questions move the topic on your map.">Tres preguntas mueven el tema en tu mapa.</p></div>
+    <div class="step"><h4 data-en="Today">Hoy</h4><p data-en="Weakest topic of your next deadline, in a free slot.">El tema más débil de tu próxima entrega, en un hueco libre.</p></div>
+    <div class="step"><h4 data-en="Receipt">Recibo</h4><p data-en="On your calendar, verified.">En tu calendario, verificado.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="split">
+    <div>
+      <span class="eyebrow" data-en="What you know, at a glance">Lo que sabes, de un vistazo</span>
+      <h2 data-en="Your gaps show up the same day, not on exam day.">Tus lagunas aparecen el mismo día, no en el examen.</h2>
+      <p class="intro" style="margin-bottom:0" data-en="Each “didn't get it” and each missed question lowers the topic. Each quiz you nail raises it. The map tells you where to go next.">Cada “no entendí” y cada pregunta fallada bajan el tema. Cada quiz que aciertas lo sube. El mapa te dice a dónde ir.</p>
+    </div>
+    <div>
+      <div class="map">
+        <div class="course"><h4 data-en="Data Structures">Estructuras de Datos</h4>
+          <div class="topic"><span class="dot" style="background:var(--ok)"></span><span>Big-O</span><span>86%</span></div>
+          <div class="topic"><span class="dot" style="background:var(--warn)"></span><span data-en="Binary search trees">Árboles de búsqueda</span><span>62%</span></div>
+          <div class="topic"><span class="dot" style="background:var(--gap)"></span><span data-en="AVL rotations">Rotaciones AVL</span><span>31%</span></div>
+          <div class="topic"><span class="dot" style="background:var(--gap)"></span><span>Heaps</span><span>38%</span></div>
+          <div class="topic"><span class="dot" style="background:var(--unseen)"></span><span data-en="Hash tables">Tablas hash</span><span>—</span></div>
+        </div>
+        <div class="course"><h4 data-en="Linear Algebra">Álgebra Lineal</h4>
+          <div class="topic"><span class="dot" style="background:var(--ok)"></span><span data-en="Matrices">Matrices</span><span>80%</span></div>
+          <div class="topic"><span class="dot" style="background:var(--warn)"></span><span data-en="Determinants">Determinantes</span><span>58%</span></div>
+          <div class="topic"><span class="dot" style="background:var(--gap)"></span><span data-en="Eigenvalues">Eigenvalores</span><span>28%</span></div>
+          <div class="topic"><span class="dot" style="background:var(--unseen)"></span><span data-en="Diagonalization">Diagonalización</span><span>—</span></div>
+        </div>
+      </div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--ok)"></span> <span data-en="mastered">dominado</span></span>
+        <span><span class="dot" style="background:var(--warn)"></span> <span data-en="in progress">en progreso</span></span>
+        <span><span class="dot" style="background:var(--gap)"></span> <span data-en="gap">laguna</span></span>
+        <span><span class="dot" style="background:var(--unseen)"></span> <span data-en="not seen">sin ver</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tarea">
+  <div class="split">
+    <div class="chat" aria-label="Ejemplo de conversación">
+      <div class="msg me" data-en="Do homework 5 for me">Hazme la tarea 5</div>
+      <div class="msg rf"><span data-en="I won't do it for you, but I'll break it down so you can.">No la hago por ti, pero te la desarmo para que la hagas tú.</span>
+        <ol>
+          <li data-en="Write in one line what you must deliver.">Escribe en una línea qué te piden entregar.</li>
+          <li data-en="Open the heaps explanation from Tuesday's lecture.">Abre la explicación de heaps de la clase del martes.</li>
+          <li data-en="Do sift-up by hand with 5 numbers.">Haz sift-up a mano con 5 números.</li>
+          <li data-en="Check against the worked example.">Compara con el ejemplo resuelto.</li>
+        </ol>
+        <div class="blk" data-en="+ 40 min guided block, tomorrow 6:00 pm">+ bloque guiado de 40 min, mañana 6:00 pm</div>
+      </div>
+    </div>
+    <div>
+      <span class="eyebrow" data-en="The homework rule">La regla de la tarea</span>
+      <h2 data-en="It teaches you to do it. It doesn't do it for you.">Te enseña a hacerla. No la hace por ti.</h2>
+      <p class="intro" style="margin-bottom:24px" data-en="It's not a prompt that asks nicely: it's a rule in code, with tests. Ask for graded work and you get a guided plan and time on your calendar.">No es un prompt que lo pide por favor: es una regla en código, con pruebas. Si pides trabajo evaluado, recibes un plan guiado y tiempo en tu calendario.</p>
+      <div class="receipt" aria-label="Recibo de ejemplo">
+        <div class="r"><span data-en="action">acción</span><span data-en="Review AVL rotations · 50 min">Repasar Rotaciones AVL · 50 min</span></div>
+        <div class="r"><span data-en="target">destino</span><span>google_calendar</span></div>
+        <div class="r"><span data-en="status">estado</span><b data-en="sent · verified">sent · verificado</b></div>
+        <div class="r"><span data-en="why">por qué</span><span data-en="Exam Tuesday, topic at 31%">Examen el martes, tema en 31 %</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow" data-en="Made in El Paso">Hecho en El Paso</span>
+  <h2 data-en="For the student who works, commutes, and thinks in two languages.">Para quien trabaja, maneja y piensa en dos idiomas.</h2>
+  <div class="ep">
+    <div><strong data-en="Bilingual by default">Bilingüe de fábrica</strong><p data-en="Your professor switches to English mid-sentence. Re-Frame follows, and explains in the language you choose.">Tu profe cambia a inglés a media frase. Re-Frame lo sigue y te explica en el idioma que elijas.</p></div>
+    <div><strong data-en="Twenty minutes, not a chapter">Veinte minutos, no un capítulo</strong><p data-en="If you work part-time, you don't have hours to reread. You get the exact block your weakest topic needs.">Si trabajas medio tiempo no tienes horas para releer. Recibes el bloque exacto que pide tu tema más débil.</p></div>
+    <div><strong data-en="Never your password">Nunca tu contraseña</strong><p data-en="It imports your Blackboard calendar link and your syllabus PDF. It never logs into anything as you.">Importa el link de calendario de Blackboard y el PDF del syllabus. Nunca entra a nada como tú.</p></div>
+  </div>
+</section>
+
+<section class="closing">
+  <h2><span data-en="Find out">Entérate</span> <span class="frame"><span class="c1"></span><span class="c2"></span><span data-en="today">hoy</span></span><span data-en=", not on exam day.">, no el día del examen.</span></h2>
+  <div class="ctas" style="margin-top:28px">
+    <a class="btn pri" href="#como" data-en="See it in action">Verlo en acción</a>
+  </div>
+</section>
+
+<footer>
+  <span data-en="Re-Frame · UTEP Hackathon 2026 · Track 1: Personalized Education">Re-Frame · Hackathon UTEP 2026 · Track 1: Educación personalizada</span>
+  <span data-en="Working name">Nombre provisional</span>
+</footer>
+</div>
+
+<script>
+const P = {
+  es: {
+    d: `<div class="tree"><div class="chain"><span class="n">10</span><i></i><span class="n">20</span><i></i><span class="n">30</span></div><span class="arrow">→</span><div class="bal"><span class="n up">20</span><div class="kids"><span class="n">10</span><span class="n">30</span></div></div></div>`,
+    a: `Como un móvil de cuna que se carga de un lado: mueves el punto de donde cuelga y queda parejo, sin cambiar el orden de las piezas de izquierda a derecha.`,
+    e: `<div class="mono">Inserta 10, 20, 30<br>balance(10) = 0 − 2 = −2 → rotar<br>20 sube · 10 baja a su izquierda<br>si 20 tenía hijo izq. (15) → pasa a der. de 10</div>`,
+    s: `<ul class="sum"><li>Balance válido: −1, 0 o 1.</li><li>LL y RR: una rotación. LR y RL: dos.</li><li>El subárbol interno cambia de padre.</li></ul>`
+  },
+  en: {
+    a: `Like a crib mobile loaded on one side: you move the point it hangs from and it levels out, without changing the left-to-right order of the pieces.`,
+    e: `<div class="mono">Insert 10, 20, 30<br>balance(10) = 0 − 2 = −2 → rotate<br>20 moves up · 10 drops to its left<br>if 20 had a left child (15) → it goes right of 10</div>`,
+    s: `<ul class="sum"><li>Valid balance: −1, 0 or 1.</li><li>LL and RR: one rotation. LR and RL: two.</li><li>The inner subtree changes parent.</li></ul>`
+  }
+};
+P.en.d = P.es.d;
+let lang = 'es', k = 'd', auto = true;
+const panel = document.getElementById('panel');
+const tabs = [...document.querySelectorAll('.tabs button')];
+function show(next){
+  k = next;
+  tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.k === k)));
+  panel.dataset.k = k;
+  panel.innerHTML = `<div>${P[lang][k]}</div>`;
+}
+tabs.forEach(t => t.addEventListener('click', () => { auto = false; show(t.dataset.k); }));
+const order = ['d','a','e','s'];
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  setInterval(() => { if (auto && !document.hidden) show(order[(order.indexOf(k)+1) % 4]); }, 3200);
+}
+show('d');
+
+const els = [...document.querySelectorAll('[data-en]')];
+els.forEach(el => el.dataset.es = el.textContent);
+const btn = document.getElementById('lang');
+function setLang(l){
+  lang = l;
+  document.documentElement.lang = l;
+  els.forEach(el => el.textContent = el.dataset[l]);
+  btn.textContent = l === 'es' ? 'EN' : 'ES';
+  btn.setAttribute('aria-label', l === 'es' ? 'Switch to English' : 'Cambiar a español');
+  show(k);
+  try { localStorage.setItem('rf-lang', l); } catch (e) {}
+}
+btn.addEventListener('click', () => setLang(lang === 'es' ? 'en' : 'es'));
+try { if (localStorage.getItem('rf-lang') === 'en') setLang('en'); } catch (e) {}
+</script>
+</body>
+</html>
