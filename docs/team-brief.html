@@ -1,0 +1,277 @@
+<title>Re-Frame Team Brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f3f4f8; --surface:#ffffff; --surface-2:#eceef4; --line:#d9dce6;
+  --ink:#181a22; --muted:#5d6273; --accent:#5b3fe0; --accent-ink:#fff;
+  --ok:#1e9e5a; --warn:#b7800f; --gap:#d04545; --unseen:#7a8092;
+  --display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;
+  --body:'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#0f1115;--surface:#171a21;--surface-2:#1f232c;--line:#2a2f3a;
+  --ink:#e8eaf0;--muted:#9aa1b2;--accent:#8f78ff;--accent-ink:#0f1115;--ok:#2fbf71;--warn:#f2b632;--gap:#ef5b5b;--unseen:#6b7285}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0f1115;--surface:#171a21;--surface-2:#1f232c;--line:#2a2f3a;
+  --ink:#e8eaf0;--muted:#9aa1b2;--accent:#8f78ff;--accent-ink:#0f1115;--ok:#2fbf71;--warn:#f2b632;--gap:#ef5b5b;--unseen:#6b7285}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--body);padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+header{padding-top:48px;display:flex;flex-direction:column;gap:14px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font:700 clamp(36px,7vw,60px)/1.02 var(--display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+h1 .re{color:var(--accent)}
+.lede{font-size:18px;max-width:62ch;margin:0}
+.lede strong{font-weight:600}
+h2{font:700 26px/1.15 var(--display);margin:0 0 6px;letter-spacing:-.01em;text-wrap:balance}
+h3{font:600 15px/1.3 var(--body);margin:0}
+p{margin:0;max-width:68ch}
+.sub{color:var(--muted);margin-bottom:18px}
+section{display:flex;flex-direction:column;gap:12px}
+.meta{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:500 12px/1 var(--mono);padding:6px 9px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:var(--surface)}
+.chip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+a{color:var(--accent);text-underline-offset:3px}
+code,.mono{font-family:var(--mono);font-size:13px}
+/* transcript demo */
+.demo{display:grid;grid-template-columns:1.1fr 1fr;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.tx{padding:18px;display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--line)}
+.seg{display:flex;gap:10px;font-size:14px;padding:6px 8px;border-radius:8px}
+.seg time{font:12px/1.7 var(--mono);color:var(--muted);flex:none}
+.seg.hit{background:var(--surface-2);box-shadow:inset 3px 0 0 var(--gap)}
+.en{font:11px var(--mono);color:var(--muted);margin-right:4px}
+.ex{padding:18px;display:flex;flex-direction:column;gap:10px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tabs span{font-size:12px;padding:4px 9px;border-radius:6px;color:var(--muted)}
+.tabs span:first-child{background:var(--accent);color:var(--accent-ink)}
+.tree{display:flex;align-items:center;gap:10px;justify-content:center;padding:12px;background:var(--surface-2);border-radius:8px;font:12px var(--mono);flex-wrap:wrap}
+.node{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--ink);display:grid;place-items:center}
+.col{display:flex;flex-direction:column;align-items:center;gap:6px}
+.row{display:flex;gap:6px}
+.receipt{font:12px/1.5 var(--mono);color:var(--ok)}
+/* pillars */
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.pillar{background:var(--surface);padding:16px;display:flex;flex-direction:column;gap:6px}
+.pillar .q{font:500 12px/1.4 var(--mono);color:var(--muted)}
+/* steps */
+ol.steps{margin:0;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:10px}
+ol.steps li{counter-increment:s;display:grid;grid-template-columns:28px 1fr;gap:10px}
+ol.steps li::before{content:counter(s);font:600 13px/28px var(--mono);text-align:center;border:1px solid var(--line);border-radius:50%;height:28px;background:var(--surface)}
+/* table */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--surface-2)}
+tr:last-child td{border-bottom:0}
+td.who{font-weight:600;white-space:nowrap}
+.light{color:var(--muted)}
+/* stages */
+.stages{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stage{border-top:3px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.stage.s0{border-color:var(--unseen)}.stage.s1{border-color:var(--gap)}.stage.s2{border-color:var(--warn)}.stage.s3{border-color:var(--ok)}
+.stage .when{font:500 12px var(--mono);color:var(--muted)}
+.stage ul{margin:0;padding-left:16px;font-size:14px;display:flex;flex-direction:column;gap:3px}
+/* rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px 28px}
+.rule h3{margin-bottom:2px}
+.rule p{font-size:14px;color:var(--muted)}
+/* code */
+pre{margin:0;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font:13px/1.65 var(--mono)}
+.c{color:var(--muted)}
+.copy{align-self:flex-start;font:500 12px var(--mono);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+.copy:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tag{font:500 11px var(--mono);padding:2px 7px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
+.tag.req{color:var(--gap);border-color:var(--gap)}
+.tag.opt{color:var(--muted)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.no{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--gap)}
+footer{color:var(--muted);font-size:13px}
+@media (max-width:720px){
+  .demo{grid-template-columns:1fr}.tx{border-right:0;border-bottom:1px solid var(--line)}
+  .pillars,.rules{grid-template-columns:1fr}.stages{grid-template-columns:1fr 1fr}
+}
+@media (max-width:420px){.stages{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">Hackathon UTEP · Track 1 · nombre provisional</span>
+  <h1><span class="re">Re-</span>Frame</h1>
+  <p class="lede">Escucha tu clase, detecta lo que no entendiste, te lo explica de cuatro formas y aparta en tu calendario el tiempo para repasarlo antes del examen. <strong>Explica, nunca hace la tarea.</strong></p>
+  <div class="meta">
+    <span class="chip on">App de escritorio · Electron</span>
+    <span class="chip">7 personas · 3 días</span>
+    <span class="chip">26 issues en 5 etapas</span>
+    <span class="chip">Funciona sin llaves</span>
+  </div>
+</header>
+
+<section>
+  <h2>El momento que vamos a demostrar</h2>
+  <p class="sub">Sofía, 3er semestre de Ingeniería en Sistemas. Su parcial de árboles es en 4 días. Toca la frase que no entendió.</p>
+  <div class="demo" role="img" aria-label="Ejemplo de transcripción con frase marcada y explicación">
+    <div class="tx">
+      <div class="seg"><time>1:15</time><span>En el caso derecha-derecha hacemos una rotación simple a la izquierda.</span></div>
+      <div class="seg"><time>1:30</time><span><span class="en">[EN]</span>In the left-right case you need a double rotation.</span></div>
+      <div class="seg hit"><time>1:45</time><span>Ojo, el subárbol izquierdo del nodo que sube se convierte en el subárbol derecho del que baja.</span></div>
+      <div class="seg"><time>2:00</time><span>Para el examen quiero que dibujen cada rotación paso a paso.</span></div>
+    </div>
+    <div class="ex">
+      <h3>Rotaciones AVL</h3>
+      <div class="tabs"><span>Diagrama</span><span>Analogía</span><span>Ejemplo</span><span>Resumen</span></div>
+      <div class="tree">
+        <div class="row"><span class="node">10</span>→<span class="node">20</span>→<span class="node">30</span></div>
+        <span>⟶</span>
+        <div class="col"><span class="node">20</span><div class="row"><span class="node">10</span><span class="node">30</span></div></div>
+      </div>
+      <p style="font-size:13px">Quiz de 3 → el tema sigue en <span class="dot" style="background:var(--gap)"></span>laguna, 31 %.</p>
+      <p style="font-size:13px"><strong>Hoy:</strong> “50 min el sábado a las 7 pm, antes de tu examen.” Agendar.</p>
+      <span class="receipt">Recibo: sent · verificado en Google Calendar</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Cómo cumple el track, palabra por palabra</h2>
+  <div class="pillars">
+    <div class="pillar"><span class="q">understand what they know</span><h3>Estado por tema</h3><p>Cada clase transcrita y cada quiz mueven el tema entre dominado, en progreso, laguna y sin ver.</p></div>
+    <div class="pillar"><span class="q">identify what they struggle with</span><h3>“No entendí esto”</h3><p>Tocar una frase o fallar una pregunta baja el tema. El mapa lo pinta en rojo.</p></div>
+    <div class="pillar"><span class="q">decide what to study next</span><h3>Hoy</h3><p>El tema más débil de la entrega más cercana, en un hueco libre. Apruebas y queda en tu calendario con recibo.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Guion de la demo</h2>
+  <p class="sub">Noventa segundos. Cada paso tiene plan B ya construido.</p>
+  <ol class="steps">
+    <li><span><strong>Clase en vivo.</strong> Suena un clip de 2 minutos y la transcripción aparece por segmentos, con el inglés marcado. <span class="light">Plan B: clip ya transcrito en el seed.</span></span></li>
+    <li><span><strong>No entendí.</strong> Tocamos la frase del subárbol. Diagrama, analogía, ejemplo y resumen. <span class="light">Plan B: contenido de respaldo sin LLM.</span></span></li>
+    <li><span><strong>Quiz.</strong> Falla una de tres y Rotaciones AVL sigue en rojo en Mis temas.</span></li>
+    <li><span><strong>Hoy.</strong> Propone 50 minutos antes del examen con la razón escrita. Clic en Agendar.</span></li>
+    <li><span><strong>Recibo.</strong> El evento aparece en Google Calendar proyectado. <span class="light">Plan B: recibo “skipped” honesto y video grabado.</span></span></li>
+    <li><span><strong>El límite.</strong> “Hazme la tarea 5.” Se niega y arma un plan guiado de 4 pasos con un bloque de 40 minutos.</span></li>
+  </ol>
+</section>
+
+<section>
+  <h2>Quién hace qué</h2>
+  <p class="sub">Cada área tiene sus archivos. Si tu issue no está en tu área, pregunta antes de tocar.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Rol</th><th>Quién</th><th>Qué entrega</th><th>Issues</th></tr></thead>
+    <tbody>
+      <tr><td class="who">Integrador</td><td>Pedro</td><td>Llaves, Google de demo, contratos, merges, freeze, checklist de demo.</td><td class="mono">#2 #20</td></tr>
+      <tr><td class="who">Audio</td><td>Magio</td><td>Grabación por segmentos en Electron, transcripción bilingüe. Su Dictadito entra aquí.</td><td class="mono">#4 #5 #13</td></tr>
+      <tr><td class="who">Acciones</td><td>Bart</td><td>Google Calendar con recibo verificado, iCal de Blackboard, huecos reales.</td><td class="mono">#8 #11 #14</td></tr>
+      <tr><td class="who">Explicador</td><td>Persona 5</td><td>Cuatro representaciones confiables, guardia de integridad, syllabus.</td><td class="mono">#6 #7 #12</td></tr>
+      <tr><td class="who">Estado + frontend</td><td>Persona 6</td><td>Quiz que mueve el mapa, bilingüe, onboarding.</td><td class="mono">#9 #15 #16</td></tr>
+      <tr><td class="who">Datos de demo</td><td>Persona 7</td><td>Semestre completo, clip de clase grabado, video de respaldo.</td><td class="mono">#10 #19</td></tr>
+      <tr><td class="who">Branding y pitch</td><td>Vic</td><td>Nombre, paleta, logo, ícono, deck y video. Sin tareas de código.</td><td class="mono">#3 #17 #18</td></tr>
+    </tbody>
+  </table></div>
+  <p class="light" style="font-size:14px">Issue #1 es para los 7: correr la app y comentar “listo”.</p>
+</section>
+
+<section>
+  <h2>Etapas</h2>
+  <div class="stages">
+    <div class="stage s0"><span class="when">E0 · hoy, 2 h</span><h3>Arranque</h3><ul><li>Los 7 corren la app</li><li>Llaves y Google</li><li>Branding v0</li></ul></div>
+    <div class="stage s1"><span class="when">E1 · día 1</span><h3>Corte vertical real</h3><ul><li>Grabar y transcribir</li><li>Explicador con LLM</li><li>Quiz mueve temas</li><li>Calendar con recibo</li></ul></div>
+    <div class="stage s2"><span class="when">E2 · día 2</span><h3>Producto</h3><ul><li>iCal y syllabus</li><li>Tema por segmento</li><li>ES / EN</li><li>Onboarding</li></ul></div>
+    <div class="stage s3"><span class="when">E3 · día 3</span><h3>Demo</h3><ul><li>Branding final</li><li>Freeze 12:00</li><li>Video y deck</li><li>5 ensayos</li></ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>Reglas para no romperle el trabajo a nadie</h2>
+  <p class="sub">Aplican igual a ti y a tu Claude. El repo trae CLAUDE.md con esto mismo para los agentes.</p>
+  <div class="rules">
+    <div class="rule"><h3>Solo tu área</h3><p>El mapa de archivos por área está en CONTRIBUTING.md. Pídele a tu agente que lo lea antes de empezar.</p></div>
+    <div class="rule"><h3>Los contratos son de los 7</h3><p><code>backend/app/contracts.py</code> define todo lo que viaja entre backend y app. Agregar un campo opcional, sí. Renombrar o borrar, con issue y el integrador.</p></div>
+    <div class="rule"><h3>Ramas y PR, nunca main</h3><p>Rama <code>nombre/numero-tema</code>, PR chico, una aprobación, squash merge. Después todos hacen pull.</p></div>
+    <div class="rule"><h3>make check antes del PR</h3><p>Corre pruebas, verifica contratos, typecheck y build. Es exactamente lo que corre CI.</p></div>
+    <div class="rule"><h3>Default alive</h3><p>La app tiene que hacer la demo completa sin ninguna llave. Todo lo que llame a un servicio necesita respaldo.</p></div>
+    <div class="rule"><h3>Sin recibo no pasó</h3><p>Toda acción externa deja recibo. Verificado solo si releímos el efecto en Google.</p></div>
+    <div class="rule"><h3>Si se rompe main</h3><p>Avisa, <code>git revert</code> del commit culpable, y el dueño lo rehace en su rama.</p></div>
+    <div class="rule"><h3>Nada de contraseñas</h3><p>Ni llaves en git ni usuario del LMS. Importamos iCal y PDF.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Arrancar en tu máquina</h2>
+  <p class="sub">Necesitas Python 3.12+, Node 22+ y acceso al repo <span class="mono">arampersand/re-frame</span>. Pídele a Pedro la invitación.</p>
+  <pre id="setup"><span class="c"># una vez</span>
+gh repo clone arampersand/re-frame && cd re-frame
+make setup
+
+<span class="c"># terminal 1: API en http://127.0.0.1:8787/docs</span>
+make backend
+
+<span class="c"># terminal 2: la app</span>
+make desktop</pre>
+  <button class="copy" type="button" data-target="setup">Copiar comandos</button>
+</section>
+
+<section>
+  <h2>Variables de entorno</h2>
+  <p class="sub">En <code>.env</code> en la raíz. Con ninguna, la demo corre con datos de respaldo. Las llaves se pasan por chat privado, nunca por git.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Variable</th><th>Para qué</th><th>Quién</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">GROQ_API_KEY</td><td>LLM y transcripción gratis. Con esta sola ya funciona todo lo de IA.</td><td><span class="tag req">recomendada</span></td></tr>
+      <tr><td class="mono">ANTHROPIC_API_KEY</td><td>Mejores explicaciones. Primera en el failover.</td><td><span class="tag opt">opcional</span></td></tr>
+      <tr><td class="mono">OPENAI_API_KEY</td><td>Whisper para transcribir, y LLM de último respaldo.</td><td><span class="tag opt">opcional</span></td></tr>
+      <tr><td class="mono">GEMINI_API_KEY</td><td>Otro respaldo de LLM.</td><td><span class="tag opt">opcional</span></td></tr>
+      <tr><td class="mono">GOOGLE_CLIENT_ID<br>GOOGLE_CLIENT_SECRET<br>GOOGLE_REFRESH_TOKEN</td><td>Agendar en Google Calendar. El token sale de <code>backend/scripts/google_auth.py</code>.</td><td>Bart y la máquina de demo</td></tr>
+      <tr><td class="mono">DRY_RUN</td><td><code>true</code> nunca escribe en Google. Ponlo en <code>false</code> solo para probar Calendar.</td><td>todos</td></tr>
+      <tr><td class="mono">TIMEZONE</td><td><code>America/Denver</code>, la hora de El Paso.</td><td>todos</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Funciones que estaría chido tener</h2>
+  <p class="sub">Solo cuando E1 esté completo. Ordenadas por impacto en la demo contra esfuerzo.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Función</th><th>Por qué suma</th><th>Esfuerzo</th></tr></thead>
+    <tbody>
+      <tr><td>Resumen de clase y flashcards al detener</td><td>Valor inmediato, fácil de mostrar</td><td>Bajo</td></tr>
+      <tr><td>Repaso espaciado a los 3 y 7 días</td><td>Ciencia del aprendizaje real; jueces de Education lo valoran</td><td>Bajo</td></tr>
+      <tr><td>Explicación por voz</td><td>Accesibilidad, estudiar en el bus</td><td>Bajo</td></tr>
+      <tr><td>Pomodoro dentro del bloque agendado</td><td>Cierra el ciclo plan, foco y quiz</td><td>Bajo</td></tr>
+      <tr><td>Frase difícil resaltada en vivo</td><td>Momento visual fuerte durante la clase</td><td>Medio</td></tr>
+      <tr><td>Bloqueo de distracciones en modo foco</td><td>Muy visual y posible por ser app de escritorio</td><td>Medio</td></tr>
+      <tr><td>Correo al profe para pedir asesoría</td><td>Segunda acción con permiso y recibo</td><td>Medio</td></tr>
+      <tr><td>Grupos de estudio con leaderboard</td><td>Loop social y retención</td><td>Alto</td></tr>
+      <tr><td>Becas e internships según tu meta</td><td>Visión de producto más allá del semestre</td><td>Alto</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Decisiones cerradas</h2>
+  <p class="sub">No se reabren sin una razón nueva.</p>
+  <div class="tbl"><table>
+    <tbody>
+      <tr><td class="who">Track 1, universidad</td><td>Nada de K-12 ni hardware.</td></tr>
+      <tr><td class="who">Electron</td><td>Para capturar el audio de clase con confianza. React, TypeScript y Tailwind adentro.</td></tr>
+      <tr><td class="who">Default alive</td><td>La demo abre con un semestre ya vivido, nunca vacía.</td></tr>
+      <tr><td class="who">Múltiples representaciones</td><td>No “estilos de aprendizaje”, una teoría desacreditada. Siempre damos las cuatro.</td></tr>
+      <tr><td class="who">Una acción bien hecha</td><td>Google Calendar con permiso y recibo verificado.</td></tr>
+      <tr><td class="who">Sin fine-tuning</td><td>El perfil y el historial van como contexto.</td></tr>
+      <tr><td class="who light">Descartadas</td><td class="light"><span class="no">Teachers Bridge</span> · <span class="no">finanzas y fiscal</span> · <span class="no">pomodoro como producto</span> · <span class="no">no verbales con hardware</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer>Repo privado: github.com/arampersand/re-frame · Contexto completo en docs/CONTEXT.md · Etapas y funciones en docs/ROADMAP.md</footer>
+</div>
+
+<script>
+document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',()=>{
+  const el=document.getElementById(b.dataset.target);
+  const text=el.innerText;
+  const done=()=>{b.textContent='Copiado';setTimeout(()=>b.textContent='Copiar comandos',1600)};
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(done).catch(()=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r)})}
+}));
+</script>
