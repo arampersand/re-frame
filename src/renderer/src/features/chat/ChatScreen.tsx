@@ -5,10 +5,10 @@ import { Button, Markdown } from '@/components/ui'
 type ChatMeta = { id: string; title: string; createdAt: string }
 
 const SUGGESTIONS = [
-  '¿Qué no he entendido esta semana y qué estudio antes de mi examen?',
-  'Explícame las rotaciones dobles AVL con un dibujo',
-  'Hazme la tarea 5 del heap',
-  'Hazme 3 preguntas para ver si entendí eigenvalores'
+  '¿Qué no he entendido y qué estudio antes de mi próximo examen?',
+  '¿Qué entregas tengo esta semana y cómo voy con cada una?',
+  'Resúmeme mi última clase en 5 puntos',
+  'Hazme 3 preguntas de mi materia más floja'
 ]
 
 export function ChatScreen({ onOpenNote }: { onOpenNote: (p: string) => void }) {

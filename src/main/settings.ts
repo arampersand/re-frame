@@ -8,7 +8,7 @@ type Settings = { vaultPath: string; groqKeyEnc?: string }
 const file = () => join(app.getPath('userData'), 'settings.json')
 
 export function loadSettings(): Settings {
-  const fallback: Settings = { vaultPath: join(homedir(), 'Documents', 'ReFrame') }
+  const fallback: Settings = { vaultPath: join(homedir(), 'Documents', 'MyBrainBook') }
   if (!existsSync(file())) return fallback
   try { return { ...fallback, ...JSON.parse(readFileSync(file(), 'utf8')) } } catch { return fallback }
 }

@@ -1,8 +1,15 @@
-import { spawn, execFile } from 'node:child_process'
+import { spawn, execFile, execFileSync } from 'node:child_process'
+import { homedir } from 'node:os'
 import { vaultPath } from './vault'
 
-// Apps launched from Finder don't inherit the shell PATH.
-const PATH = ['/opt/homebrew/bin', '/usr/local/bin', '/usr/bin', '/bin', process.env.PATH ?? ''].join(':')
+// Apps launched from Finder don't inherit the shell PATH: ask the login shell, plus common spots.
+function shellPath(): string {
+  try {
+    return execFileSync(process.env.SHELL || '/bin/zsh', ['-ilc', 'printf %s "$PATH"'], { timeout: 4000, encoding: 'utf8' }).trim()
+  } catch { return '' }
+}
+const PATH = [shellPath(), '/opt/homebrew/bin', '/usr/local/bin', `${homedir()}/.local/bin`, `${homedir()}/.npm-global/bin`, '/usr/bin', '/bin', process.env.PATH ?? '']
+  .filter(Boolean).join(':')
 const env = { ...process.env, PATH }
 
 export type CodexEvent =

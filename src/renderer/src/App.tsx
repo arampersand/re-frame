@@ -34,7 +34,7 @@ export function App() {
   return (
     <div className="flex h-full">
       <nav className="flex w-56 flex-col gap-1 border-r border-border bg-surface p-3 pt-10 drag">
-        <p className="mb-5 px-2 text-lg font-bold tracking-tight">Re-Frame</p>
+        <p className="mb-5 px-2 text-lg font-bold tracking-tight">MyBrainBook</p>
         {NAV.map(s => (
           <button key={s.id} onClick={() => setScreen(s.id)}
             className={`no-drag flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm ${screen === s.id ? 'bg-primary text-primary-ink' : 'text-muted hover:bg-surface-2'}`}>

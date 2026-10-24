@@ -15,7 +15,7 @@ function createWindow(): void {
     height: 860,
     minWidth: 960,
     minHeight: 640,
-    title: 'Re-Frame',
+    title: 'MyBrainBook',
     titleBarStyle: 'hiddenInset',
     backgroundColor: '#0f1115',
     webPreferences: { preload: join(__dirname, '../preload/index.js'), sandbox: false, contextIsolation: true }

@@ -9,7 +9,7 @@ export const vaultPath = () => loadSettings().vaultPath
 export function ensureVault(): string {
   const root = vaultPath()
   if (!existsSync(join(root, 'AGENTS.md'))) {
-    const seed = join(app.getAppPath(), 'seed', 'vault')
+    const seed = app.isPackaged ? join(process.resourcesPath, 'seed', 'vault') : join(app.getAppPath(), 'seed', 'vault')
     mkdirSync(root, { recursive: true })
     cpSync(seed, root, { recursive: true, force: false, errorOnExist: false })
   }

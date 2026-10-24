@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MyBrainBook — the second brain for students</title>
+<meta name="description" content="A free Mac app for students: record your classes, drop your PDFs and chat with everything you've learned. Your notes stay on your Mac." />
+<meta property="og:title" content="MyBrainBook — the second brain for students" />
+<meta property="og:description" content="Record class, drop your PDFs, chat with everything you've learned." />
+<meta property="og:image" content="/icon.png" />
+<link rel="icon" href="/icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0c0d12; --surface: #15171f; --surface-2: #1d2029; --border: #272b36;
+    --text: #eceef4; --muted: #9aa1b2; --primary: #7c5cff; --primary-2: #4b2bd6; --gold: #ffd166; --green: #2fbf71;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: Inter, system-ui, -apple-system, sans-serif; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; letter-spacing: -.01em; }
+  .logo img { width: 34px; height: 34px; }
+  .nav-right { display: flex; align-items: center; gap: 14px; font-size: 14px; color: var(--muted); }
+  .lang { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 6px 10px; font: inherit; cursor: pointer; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; background: var(--primary); color: #fff; font-weight: 600; border-radius: 12px; padding: 14px 22px; font-size: 16px; transition: transform .15s, filter .15s; border: 0; cursor: pointer; }
+  .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn.small { padding: 9px 14px; font-size: 14px; border-radius: 10px; }
+  .btn svg { width: 18px; height: 18px; }
+
+  .hero > *, .grid > * { min-width: 0; }
+  body { overflow-x: hidden; }
+  .hero { display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; padding: 56px 0 72px; }
+  .pill { display: inline-block; font-size: 13px; color: var(--gold); border: 1px solid rgba(255,209,102,.35); background: rgba(255,209,102,.08); padding: 5px 12px; border-radius: 999px; margin-bottom: 22px; }
+  h1 { font-size: clamp(38px, 5.4vw, 62px); line-height: 1.04; letter-spacing: -.035em; font-weight: 800; }
+  h1 em { font-style: normal; background: linear-gradient(90deg, #a48bff, var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { font-size: 19px; color: var(--muted); margin: 22px 0 32px; max-width: 34em; }
+  .cta { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+  .cta-note { font-size: 13px; color: var(--muted); }
+  .cta-note a { text-decoration: underline; }
+  .graph-card { position: relative; aspect-ratio: 1 / .9; border: 1px solid var(--border); border-radius: 24px; background: radial-gradient(circle at 50% 40%, rgba(124,92,255,.18), transparent 65%), var(--surface); overflow: hidden; }
+  .graph-card canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .graph-tag { position: absolute; left: 16px; bottom: 14px; font-size: 12px; color: var(--muted); }
+
+  section { padding: 72px 0; border-top: 1px solid var(--border); }
+  h2 { font-size: clamp(28px, 3.6vw, 40px); letter-spacing: -.025em; line-height: 1.1; font-weight: 800; max-width: 22em; }
+  .sub { color: var(--muted); margin-top: 12px; font-size: 17px; max-width: 40em; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 40px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 26px; }
+  .card .ico { font-size: 26px; }
+  .card h3 { font-size: 19px; margin: 12px 0 6px; letter-spacing: -.01em; }
+  .card p { color: var(--muted); font-size: 15.5px; }
+  .chat { margin-top: 16px; display: grid; gap: 8px; font-size: 14px; }
+  .bubble { padding: 9px 13px; border-radius: 14px; max-width: 92%; }
+  .bubble.me { background: var(--primary); justify-self: end; }
+  .bubble.ai { background: var(--surface-2); }
+  .bubble .link { color: #b9a8ff; background: rgba(124,92,255,.16); border-radius: 6px; padding: 0 5px; }
+  .steps { counter-reset: s; display: grid; gap: 14px; margin-top: 36px; }
+  .step { display: grid; grid-template-columns: 44px 1fr; gap: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 22px; }
+  .step::before { counter-increment: s; content: counter(s); width: 34px; height: 34px; border-radius: 10px; background: rgba(124,92,255,.18); color: #b9a8ff; display: grid; place-items: center; font-weight: 700; }
+  .step h3 { font-size: 17px; margin-bottom: 4px; }
+  .step p { color: var(--muted); font-size: 15px; }
+  code { font-family: ui-monospace, 'JetBrains Mono', Menlo, monospace; font-size: 13.5px; background: var(--surface-2); border: 1px solid var(--border); padding: 2px 7px; border-radius: 6px; color: var(--text); white-space: nowrap; }
+  .rule { display: flex; gap: 18px; align-items: flex-start; background: linear-gradient(135deg, rgba(124,92,255,.14), rgba(255,209,102,.06)); border: 1px solid var(--border); border-radius: 18px; padding: 26px; margin-top: 28px; }
+  .rule .big { font-size: 34px; }
+  .rule p { color: var(--muted); }
+  .final { text-align: center; }
+  .final h2 { margin: 0 auto; }
+  .final .cta { justify-content: center; margin-top: 28px; }
+  footer { border-top: 1px solid var(--border); padding: 28px 0 40px; color: var(--muted); font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  [data-es] { } html[lang="es"] [data-en-only] { display: none; }
+
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; padding-top: 28px; }
+    .grid { grid-template-columns: 1fr; }
+    .nav-right .hide-sm { display: none; }
+    section { padding: 56px 0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="logo" href="#"><img src="/icon.png" alt="" />MyBrainBook</a>
+    <div class="nav-right">
+      <a class="hide-sm" href="#how" data-en="How it works" data-es="Cómo funciona">How it works</a>
+      <a class="hide-sm" href="#setup" data-en="Setup" data-es="Instalación">Setup</a>
+      <button class="lang" id="lang" aria-label="Language">ES</button>
+      <a class="btn small dl" href="#download" data-en="Download" data-es="Descargar">Download</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <span class="pill" data-en="Free · for Mac · made by students" data-es="Gratis · para Mac · hecha por estudiantes">Free · for Mac · made by students</span>
+      <h1 data-en="Your classes, PDFs and notes in <em>one brain that answers back.</em>" data-es="Tus clases, PDFs y apuntes en <em>un cerebro que te contesta.</em>">Your classes, PDFs and notes in <em>one brain that answers back.</em></h1>
+      <p class="lead" data-en="Hit record in class, drop the professor's PDFs, and chat with everything you've learned. MyBrainBook files it all by course and explains it back to you, your way." data-es="Dale grabar en clase, suelta los PDFs del profe y platica con todo lo que has aprendido. MyBrainBook lo acomoda por materia y te lo explica a tu manera.">Hit record in class, drop the professor's PDFs, and chat with everything you've learned. MyBrainBook files it all by course and explains it back to you, your way.</p>
+      <div class="cta" id="download">
+        <a class="btn dl" href="#setup">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.02-1.5-2.62-1.7-3.19-1.73-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.62 1.11 8.79.73 1.06 1.6 2.25 2.75 2.21 1.1-.04 1.52-.71 2.85-.71 1.33 0 1.7.71 2.87.69 1.18-.02 1.93-1.08 2.66-2.15.84-1.23 1.18-2.42 1.2-2.48-.03-.01-2.3-.88-2.3-3.54zM14.2 6.13c.6-.74 1.01-1.76.9-2.78-.87.04-1.93.58-2.55 1.31-.56.65-1.05 1.69-.92 2.69.97.07 1.96-.49 2.57-1.22z"/></svg>
+          <span class="dl-label" data-en="Download for Mac" data-es="Descargar para Mac">Download for Mac</span>
+        </a>
+        <span class="cta-note"><span class="arch-note"></span> · <a href="#" class="alt-dl"></a></span>
+      </div>
+    </div>
+    <div class="graph-card">
+      <canvas id="graph"></canvas>
+      <span class="graph-tag" data-en="Your brain, connected: courses, classes, readings, assignments" data-es="Tu cerebro conectado: materias, clases, lecturas, tareas">Your brain, connected: courses, classes, readings, assignments</span>
+    </div>
+  </header>
+</div>
+
+<section id="how">
+  <div class="wrap">
+    <h2 data-en="Everything school throws at you, in one place." data-es="Todo lo que te avienta la escuela, en un solo lugar.">Everything school throws at you, in one place.</h2>
+    <p class="sub" data-en="Built on how students already use AI with their notes, without the setup." data-es="Así es como los estudiantes ya usan IA con sus apuntes, pero sin armar nada.">Built on how students already use AI with their notes, without the setup.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="ico">🎙️</div>
+        <h3 data-en="Record class. That's it." data-es="Graba la clase. Y ya.">Record class. That's it.</h3>
+        <p data-en="Live transcript in Spanish or English. When you stop, it figures out which course it was and writes the summary, key concepts and what's on the exam. Not sure? It asks." data-es="Transcripción en vivo en español o inglés. Al parar, averigua de qué materia fue y escribe el resumen, conceptos clave y lo que viene en el examen. ¿No está seguro? Te pregunta.">Live transcript in Spanish or English. When you stop, it figures out which course it was and writes the summary, key concepts and what's on the exam. Not sure? It asks.</p>
+      </div>
+      <div class="card">
+        <div class="ico">💬</div>
+        <h3 data-en="Chat with your own material" data-es="Platica con tu propio material">Chat with your own material</h3>
+        <div class="chat">
+          <div class="bubble me" data-en="What should I study before Tuesday's exam?" data-es="¿Qué estudio antes del examen del martes?">What should I study before Tuesday's exam?</div>
+          <div class="bubble ai" data-en="Double rotations. You flagged them in <span class='link'>Lecture 7</span> and the professor said they're on the exam. 40 min with this example:" data-es="Rotaciones dobles. Las marcaste en la <span class='link'>Clase 7</span> y el profe dijo que vienen en el examen. 40 min con este ejemplo:">Double rotations. You flagged them in <span class="link">Lecture 7</span> and the professor said they're on the exam. 40 min with this example:</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ico">📄</div>
+        <h3 data-en="Drop your PDFs" data-es="Suelta tus PDFs">Drop your PDFs</h3>
+        <p data-en="Slides, readings, syllabus. Drag them in and they land in the right course, summarized and linked to the classes where you saw that topic." data-es="Slides, lecturas, temario. Arrástralos y caen en la materia correcta, resumidos y ligados a las clases donde viste ese tema.">Slides, readings, syllabus. Drag them in and they land in the right course, summarized and linked to the classes where you saw that topic.</p>
+      </div>
+      <div class="card">
+        <div class="ico">🕸️</div>
+        <h3 data-en="See how it all connects" data-es="Mira cómo se conecta todo">See how it all connects</h3>
+        <p data-en="Courses, professors, classes, readings and assignments as a living graph. Your notes are plain markdown on your Mac. They open in Obsidian too." data-es="Materias, profes, clases, lecturas y tareas como un grafo vivo. Tus notas son markdown en tu Mac. También abren en Obsidian.">Courses, professors, classes, readings and assignments as a living graph. Your notes are plain markdown on your Mac. They open in Obsidian too.</p>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="big">🧑‍🏫</div>
+      <div>
+        <h3 data-en="It knows what you don't get yet" data-es="Sabe lo que todavía no entiendes">It knows what you don't get yet</h3>
+        <p data-en="Every &quot;I don't get it&quot; is saved. It quizzes you after explaining, and crosses your weak topics with your deadlines to tell you what to study next. It explains; it won't hand you graded work." data-es="Cada &quot;no entendí&quot; se guarda. Te pregunta después de explicar y cruza tus temas flojos con tus fechas para decirte qué estudiar. Te explica; no te entrega la tarea hecha.">Every "I don't get it" is saved. It quizzes you after explaining, and crosses your weak topics with your deadlines to tell you what to study next. It explains; it won't hand you graded work.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="setup">
+  <div class="wrap">
+    <h2 data-en="Set up in 5 minutes" data-es="Listo en 5 minutos">Set up in 5 minutes</h2>
+    <p class="sub" data-en="Free app. The AI runs on the ChatGPT plan you already have; transcription uses a free Groq key." data-es="La app es gratis. La IA corre con el plan de ChatGPT que ya tienes; la transcripción usa una llave gratis de Groq.">Free app. The AI runs on the ChatGPT plan you already have; transcription uses a free Groq key.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h3 data-en="Download and drag to Applications" data-es="Descarga y arrastra a Aplicaciones">Download and drag to Applications</h3>
+        <p data-en="Pick Apple Silicon (M1–M4) or Intel. Not sure? Apple menu → About This Mac." data-es="Elige Apple Silicon (M1–M4) o Intel. ¿No sabes? Menú Apple → Acerca de esta Mac.">Pick Apple Silicon (M1–M4) or Intel. Not sure? Apple menu → About This Mac.</p>
+      </div></div>
+      <div class="step"><div>
+        <h3 data-en="Open it the first time" data-es="Ábrela la primera vez">Open it the first time</h3>
+        <p data-en="We're not Apple-notarized yet, so macOS asks. Right-click the app → Open. On newer macOS: System Settings → Privacy &amp; Security → Open Anyway." data-es="Aún no estamos notarizados por Apple, así que macOS pregunta. Clic derecho en la app → Abrir. En macOS nuevo: Ajustes del Sistema → Privacidad y seguridad → Abrir de todos modos.">We're not Apple-notarized yet, so macOS asks. Right-click the app → Open. On newer macOS: System Settings → Privacy &amp; Security → Open Anyway.</p>
+      </div></div>
+      <div class="step"><div>
+        <h3 data-en="Connect your AI (ChatGPT plan)" data-es="Conecta tu IA (plan de ChatGPT)">Connect your AI (ChatGPT plan)</h3>
+        <p data-en="Install Codex once in Terminal: <code>npm i -g @openai/codex</code>. Then in the app go to Integrations → Connect and sign in with ChatGPT." data-es="Instala Codex una vez en la Terminal: <code>npm i -g @openai/codex</code>. Luego en la app ve a Integraciones → Connect y entra con ChatGPT.">Install Codex once in Terminal: <code>npm i -g @openai/codex</code>. Then in the app go to Integrations → Connect and sign in with ChatGPT.</p>
+      </div></div>
+      <div class="step"><div>
+        <h3 data-en="Add a free Groq key to record classes" data-es="Agrega una llave gratis de Groq para grabar clases">Add a free Groq key to record classes</h3>
+        <p data-en="Create one at <a href='https://console.groq.com/keys' target='_blank' rel='noreferrer'><u>console.groq.com/keys</u></a> and paste it in Integrations. The free tier covers hours of class a day." data-es="Créala en <a href='https://console.groq.com/keys' target='_blank' rel='noreferrer'><u>console.groq.com/keys</u></a> y pégala en Integraciones. El plan gratis alcanza para horas de clase al día.">Create one at <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer"><u>console.groq.com/keys</u></a> and paste it in Integrations. The free tier covers hours of class a day.</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <h2 data-en="Stop finding out what you missed the night before the exam." data-es="Deja de enterarte de lo que no entendiste la noche antes del examen.">Stop finding out what you missed the night before the exam.</h2>
+    <div class="cta">
+      <a class="btn dl" href="#setup"><span class="dl-label" data-en="Download for Mac" data-es="Descargar para Mac">Download for Mac</span></a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span data-en="MyBrainBook v0.2 · built at the UTEP hackathon 2026" data-es="MyBrainBook v0.2 · hecho en el hackathon de UTEP 2026">MyBrainBook v0.2 · built at the UTEP hackathon 2026</span>
+    <span data-en="Your notes never leave your Mac except to talk to the AI you connect." data-es="Tus notas no salen de tu Mac salvo para hablar con la IA que conectes.">Your notes never leave your Mac except to talk to the AI you connect.</span>
+  </footer>
+</div>
+
+<script>
+  // ---- Downloads: set DOWNLOAD_BASE to the public R2 URL once uploaded ----
+  const DOWNLOAD_BASE = '';
+  const VERSION = '0.2.0';
+  const files = { arm64: `MyBrainBook-${VERSION}-arm64.dmg`, x64: `MyBrainBook-${VERSION}-x64.dmg` };
+
+  function isAppleSilicon() {
+    try {
+      const gl = document.createElement('canvas').getContext('webgl');
+      const ext = gl && gl.getExtension('WEBGL_debug_renderer_info');
+      const r = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : '';
+      if (/Apple M\d|Apple GPU/i.test(r)) return true;
+      if (/Intel|AMD|Radeon/i.test(r)) return false;
+    } catch (e) {}
+    return true; // most Macs sold since 2020
+  }
+  const T = {
+    en: { arm: 'For Apple Silicon (M1–M4)', intel: 'For Intel Macs', altArm: 'Need the Intel version?', altIntel: 'Need the Apple Silicon version?', soon: 'Download link coming in minutes' },
+    es: { arm: 'Para Apple Silicon (M1–M4)', intel: 'Para Mac con Intel', altArm: '¿Necesitas la versión Intel?', altIntel: '¿Necesitas la versión Apple Silicon?', soon: 'El link de descarga sale en unos minutos' }
+  };
+  let arch = isAppleSilicon() ? 'arm64' : 'x64';
+  let lang = (navigator.language || 'en').startsWith('es') ? 'es' : 'en';
+  try { lang = localStorage.getItem('mbb-lang') || lang } catch (e) {}
+
+  function render() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-en]').forEach(el => { el.innerHTML = el.dataset[lang] });
+    document.getElementById('lang').textContent = lang === 'en' ? 'ES' : 'EN';
+    const t = T[lang];
+    const href = DOWNLOAD_BASE ? `${DOWNLOAD_BASE}/${files[arch]}` : '#setup';
+    document.querySelectorAll('.btn.dl:not(.small)').forEach(a => a.href = href);
+    document.querySelector('.btn.small.dl').href = '#download';
+    document.querySelector('.arch-note').textContent = DOWNLOAD_BASE ? (arch === 'arm64' ? t.arm : t.intel) : t.soon;
+    const alt = document.querySelector('.alt-dl');
+    alt.textContent = arch === 'arm64' ? t.altArm : t.altIntel;
+    alt.style.display = DOWNLOAD_BASE ? '' : 'none';
+    alt.parentElement.childNodes[1].textContent = DOWNLOAD_BASE ? ' · ' : '';
+  }
+  document.getElementById('lang').onclick = () => { lang = lang === 'en' ? 'es' : 'en'; try { localStorage.setItem('mbb-lang', lang) } catch (e) {} render() };
+  document.querySelector('.alt-dl').onclick = e => { e.preventDefault(); arch = arch === 'arm64' ? 'x64' : 'arm64'; render() };
+  render();
+
+  // ---- Hero graph: a small force layout with generic school notes ----
+  (() => {
+    const c = document.getElementById('graph'), ctx = c.getContext('2d');
+    const G = [
+      ['Calculus', 0], ['Data Structures', 1], ['Business Intelligence', 2], ['English IX', 3],
+      ['Lecture 3: limits', 0], ['Lecture 7: AVL trees', 1], ['Lecture 8: heaps', 1], ['Lecture 2: ETL', 2],
+      ['Midterm 2', 1], ['Homework 5', 1], ['Reading: KPIs', 2], ['Slides: derivatives', 0],
+      ['Prof. Herrera', 4], ['Prof. Moreno', 4], ['Capstone project', 5], ['What I don’t get yet', 6],
+      ['Deadlines', 6], ['Reported speech', 3], ['Essay draft', 3], ['Study guide: trees', 1]
+    ];
+    const E = [[0,4],[0,11],[1,5],[1,6],[1,8],[1,9],[1,19],[2,7],[2,10],[3,17],[3,18],[1,12],[2,13],[1,14],[2,14],[5,15],[5,8],[6,9],[8,16],[9,16],[15,16],[5,19],[18,16],[7,10],[0,16]];
+    const COL = ['#7c5cff', '#ff7ac6', '#3fb8f0', '#2fbf71', '#ffd166', '#ff9f43', '#ef5b5b'];
+    let W, H, dpr;
+    const N = G.map(([label, g], i) => ({ label, g, x: Math.cos(i) * 120, y: Math.sin(i * 1.7) * 120, vx: 0, vy: 0, deg: 0 }));
+    E.forEach(([a, b]) => { N[a].deg++; N[b].deg++ });
+    const r = n => 5 + Math.sqrt(n.deg) * 3.4;
+    function size() { const b = c.parentElement.getBoundingClientRect(); dpr = devicePixelRatio || 1; W = b.width; H = b.height; c.width = W * dpr; c.height = H * dpr }
+    size(); addEventListener('resize', size);
+    let mouse = null, hover = null, t = 0;
+    c.addEventListener('mousemove', e => { const b = c.getBoundingClientRect(); mouse = { x: e.clientX - b.left - W / 2, y: e.clientY - b.top - H / 2 } });
+    c.addEventListener('mouseleave', () => mouse = null);
+    function step() {
+      t += 1;
+      for (const a of N) for (const b of N) if (a !== b) {
+        const dx = a.x - b.x, dy = a.y - b.y, d2 = dx * dx + dy * dy + 0.01, f = 1600 / d2;
+        a.vx += dx * f / Math.sqrt(d2) * .02; a.vy += dy * f / Math.sqrt(d2) * .02;
+      }
+      for (const [i, j] of E) {
+        const a = N[i], b = N[j], dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1, f = (d - 70) * .004;
+        a.vx += dx / d * f * d * .1; a.vy += dy / d * f * d * .1; b.vx -= dx / d * f * d * .1; b.vy -= dy / d * f * d * .1;
+      }
+      for (const n of N) {
+        n.vx -= n.x * .004; n.vy -= n.y * .004;
+        n.vx += Math.sin(t * .01 + n.g) * .02; n.vy += Math.cos(t * .012 + n.deg) * .02;
+        n.vx *= .82; n.vy *= .82; n.x += n.vx; n.y += n.vy;
+      }
+      hover = mouse ? N.find(n => Math.hypot(n.x * scale - mouse.x, n.y * scale - mouse.y) < r(n) + 10) : null;
+    }
+    let scale = 1;
+    function draw() {
+      step();
+      const ext = Math.max(...N.map(n => Math.max(Math.abs(n.x), Math.abs(n.y)))) + 40;
+      scale += ((Math.min(W, H) / 2 / ext) - scale) * .05;
+      ctx.setTransform(dpr, 0, 0, dpr, W / 2 * dpr, H / 2 * dpr);
+      ctx.clearRect(-W, -H, W * 2, H * 2);
+      const focus = hover || N[t / 160 % N.length | 0];
+      const near = new Set(); E.forEach(([a, b]) => { if (N[a] === focus) near.add(N[b]); if (N[b] === focus) near.add(N[a]) });
+      for (const [i, j] of E) {
+        const a = N[i], b = N[j], lit = a === focus || b === focus;
+        ctx.strokeStyle = lit ? 'rgba(164,139,255,.95)' : 'rgba(154,161,178,.18)'; ctx.lineWidth = lit ? 1.6 : 1;
+        ctx.beginPath(); ctx.moveTo(a.x * scale, a.y * scale); ctx.lineTo(b.x * scale, b.y * scale); ctx.stroke();
+      }
+      for (const n of N) {
+        const on = n === focus || near.has(n);
+        ctx.globalAlpha = on ? 1 : .55;
+        ctx.fillStyle = COL[n.g]; ctx.beginPath(); ctx.arc(n.x * scale, n.y * scale, r(n), 0, 7); ctx.fill();
+        if (on || n.deg > 4) { ctx.fillStyle = '#eceef4'; ctx.font = `${on ? 600 : 500} 12px Inter, system-ui`; ctx.textAlign = 'center'; ctx.fillText(n.label, n.x * scale, n.y * scale + r(n) + 14) }
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+</script>
+</body>
+</html>

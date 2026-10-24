@@ -1,4 +1,4 @@
-# Re-Frame
+# MyBrainBook
 
 **The second brain for students.** A Mac app where everything from school lives in one place, as plain notes you own:
 
@@ -8,7 +8,7 @@
 - **My brain.** Folder view and an Obsidian-style graph of how your courses, teachers, classes and assignments connect.
 - **Integrations.** AI runs on the ChatGPT plan you already have (via Codex). Transcription runs on Groq Whisper (free key).
 
-The brain is a folder of markdown at `~/Documents/ReFrame`. It opens in Obsidian as is. `AGENTS.md` inside it tells the AI how to be a tutor for that student: answer from their material, explain instead of doing graded work, track what they don't get yet.
+The brain is a folder of markdown at `~/Documents/MyBrainBook`. It opens in Obsidian as is. `AGENTS.md` inside it tells the AI how to be a tutor for that student: answer from their material, explain instead of doing graded work, track what they don't get yet.
 
 ## Run it
 
@@ -19,7 +19,7 @@ yarn
 yarn dev
 ```
 
-First launch creates `~/Documents/ReFrame` from `seed/vault` (an empty template). Add your Groq key in **Integrations** to record classes.
+First launch creates `~/Documents/MyBrainBook` from `seed/vault` (an empty template). Add your Groq key in **Integrations** to record classes.
 
 ## How it's built
 

@@ -39,7 +39,7 @@ export function IntegrationsScreen({ onChange }: { onChange: () => void }) {
             <div>
               <p className="flex items-center gap-2 font-semibold"><Dot ok={codex ? codex.loggedIn : null} /> AI · ChatGPT plan via Codex</p>
               <p className="mt-1 text-sm text-muted">Uses the ChatGPT subscription you already pay for. It reads and writes the notes in your brain to answer you.</p>
-              {codex && <p className="mt-2 text-xs text-muted">{codex.installed ? codex.detail : 'Codex CLI not found. Install it with: brew install codex'}</p>}
+              {codex && <p className="mt-2 text-xs text-muted">{codex.installed ? codex.detail : 'Codex CLI not found. Install it with: npm i -g @openai/codex  (or brew install codex), then press Connect.'}</p>}
             </div>
             {codex?.loggedIn
               ? <span className="rounded-full bg-mastered/20 px-3 py-1 text-xs text-mastered">Connected</span>

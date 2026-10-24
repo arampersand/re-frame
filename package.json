@@ -1,15 +1,16 @@
 {
-  "name": "re-frame",
+  "name": "mybrainbook",
   "version": "0.2.0",
   "private": true,
-  "description": "Second brain for students: chat, class recordings and PDFs in one local folder.",
+  "description": "MyBrainBook: the second brain for students. Chat, class recordings and PDFs in one local folder.",
   "main": "./out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit",
-    "postinstall": "node node_modules/electron/install.js"
+    "postinstall": "node node_modules/electron/install.js",
+    "dist": "electron-vite build && electron-builder --mac --arm64 --x64"
   },
   "dependencies": {
     "d3-force": "3.0.0",
@@ -27,9 +28,47 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "electron": "^45.0.0",
+    "electron-builder": "26.0.12",
     "electron-vite": "^6.0.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
     "vite": "^8.3.5"
+  },
+  "productName": "MyBrainBook",
+  "author": "MyBrainBook team",
+  "build": {
+    "appId": "app.mybrainbook.desktop",
+    "productName": "MyBrainBook",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "seed/vault",
+        "to": "seed/vault"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.education",
+      "icon": "build/icon.icns",
+      "identity": null,
+      "hardenedRuntime": false,
+      "target": [
+        "dmg"
+      ],
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "MyBrainBook records your classes to transcribe them into your notes."
+      }
+    },
+    "dmg": {
+      "artifactName": "MyBrainBook-${version}-${arch}.${ext}",
+      "title": "MyBrainBook"
+    },
+    "afterPack": "build/adhoc-sign.cjs"
   }
 }
