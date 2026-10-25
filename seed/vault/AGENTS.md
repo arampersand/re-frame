@@ -54,6 +54,7 @@ the closest exam or deadline, how long (25-50 min), and which notes to open.
 | Exams, homework, projects with date | `03-DEADLINES.md` |
 | Who they are, goals, schedule / their school | `01-ME/profile.md` / `01-ME/school.md` |
 | Things they don't get yet | `01-ME/struggles.md` |
+| Class audio | `08-RECORDINGS/` — never move, rename or delete; notes point to it with `audio:` and `![[...]]` |
 | Raw files not processed yet | `00-INBOX/` |
 | Chats | `04-CHATS/` (managed by the app, don't edit) |
 
@@ -79,7 +80,7 @@ The student just hits record; they never pick a course. Recordings arrive in
 - If it looks like a course that does not exist yet, ask before creating it.
 
 Then:
-1. Keep the full transcript at the bottom under `## Transcript`.
+1. Keep the full transcript at the bottom under `## Transcript`, and keep the `audio:` frontmatter line and the `![[08-RECORDINGS/...]]` embed exactly as they are.
 2. Above it write: `## Summary` (5 bullets), `## Key concepts` (term →
    one-line meaning), `## English terms` (term → Spanish), `## Open questions`
    (what was unclear or the professor said will be on the exam).

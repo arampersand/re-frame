@@ -1,11 +1,13 @@
-import { app, BrowserWindow, dialog, ipcMain, session, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, net, protocol, session, shell } from 'electron'
+import { pathToFileURL } from 'node:url'
 import { join } from 'node:path'
-import { ensureVault, tree, readNote, courses, vaultPath, graph } from './vault'
+import { ensureVault, tree, readNote, courses, vaultPath, graph, inVault } from './vault'
 import { codexStatus, codexLogin, prepareCodex } from './codex'
 import { testKey } from './groq'
 import { sttStatus, setEngine, downloadModel, type Engine } from './stt'
 import { getGroqKey, setGroqKey } from './settings'
-import { listChats, getChat, newChat, sendChat, startLecture, lectureChunk, finishLecture, drainLecture, importPdf } from './brain'
+import { listChats, getChat, newChat, sendChat, finishLecture, importPdf } from './brain'
+import { startRecording, appendPcm, transcribeRecording } from './recording'
 
 // Never die silently: log to ~/Library/Logs/MyBrainBook/main.log instead of crashing.
 import { appendFileSync, mkdirSync } from 'node:fs'
@@ -14,6 +16,9 @@ const logLine = (msg: string) => {
 }
 process.on('uncaughtException', e => logLine(`uncaught: ${e.stack ?? e}`))
 process.on('unhandledRejection', e => logLine(`unhandled: ${(e as Error)?.stack ?? e}`))
+
+// brain://vault/<path> serves files from the student's brain (audio players, PDFs). Range requests work.
+protocol.registerSchemesAsPrivileged([{ scheme: 'brain', privileges: { standard: true, secure: true, stream: true, supportFetchAPI: true } }])
 
 let win: BrowserWindow | null = null
 const send = (channel: string, payload: unknown) => win?.webContents.send(channel, payload)
@@ -68,10 +73,9 @@ function registerIpc() {
   ipcMain.handle('stt:setEngine', (_e, engine: Engine) => { setEngine(engine); return sttStatus() })
   ipcMain.handle('stt:download', () => downloadModel(pct => send('stt:progress', pct)))
 
-  ipcMain.handle('audio:start', () => startLecture())
-  ipcMain.handle('audio:chunk', (_e, rel: string, data: ArrayBuffer, offsetS: number) =>
-    lectureChunk(rel, Buffer.from(data), offsetS, t => send('audio:text', { rel, ...t })))
-  ipcMain.handle('audio:drain', () => drainLecture())
+  ipcMain.handle('audio:start', () => startRecording())
+  ipcMain.on('audio:pcm', (_e, rel: string, data: ArrayBuffer) => appendPcm(rel, Buffer.from(data)))
+  ipcMain.handle('audio:transcribe', (_e, rel: string) => transcribeRecording(rel, p => send('audio:progress', { rel, ...p })))
   ipcMain.handle('audio:finish', (_e, rel: string) => finishLecture(rel, ev => send('task:event', { task: 'lecture', ...ev })))
 
   ipcMain.handle('pdf:pick', async () => {
@@ -88,6 +92,12 @@ function registerIpc() {
 app.whenReady().then(() => {
   ensureVault()
   prepareCodex()
+  protocol.handle('brain', req => {
+    try {
+      const rel = decodeURIComponent(new URL(req.url).pathname.replace(/^\//, ''))
+      return net.fetch(pathToFileURL(inVault(rel)).toString(), { headers: req.headers })
+    } catch { return new Response('Not found', { status: 404 }) }
+  })
   session.defaultSession.setPermissionRequestHandler((_wc, permission, cb) => cb(permission === 'media'))
   registerIpc()
   createWindow()

@@ -1,12 +1,12 @@
 // Transcription engines: Groq (cloud, needs a key) or local whisper.cpp (model downloaded once).
 import { app } from 'electron'
-import { execFile } from 'node:child_process'
-import { createWriteStream, existsSync, mkdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { spawn } from 'node:child_process'
+import { createWriteStream, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { getGroqKey, loadSettings, saveSettings } from './settings'
-import { transcribe as groqTranscribe } from './groq'
+import { transcribeSegments } from './groq'
 
 export type Engine = 'local' | 'groq'
 
@@ -76,22 +76,51 @@ export async function downloadModel(onProgress: (pct: number) => void): Promise<
   }
 }
 
-function transcribeLocal(wav: Buffer): Promise<string> {
-  if (!localReady()) return Promise.reject(new Error('Download the local model in Integrations first'))
-  const file = join(tmpdir(), `mbb-${randomUUID()}.wav`)
-  writeFileSync(file, wav)
+export type Progress = { stage: 'transcribing' | 'saving'; pct: number }
+type Segment = { start: number; text: string }
+
+function transcribeLocalFile(file: string, onProgress: (p: Progress) => void): Promise<Segment[]> {
+  if (!localReady()) return Promise.reject(new Error('Download the on-device model in Integrations first'))
+  const prefix = join(tmpdir(), `mbb-${randomUUID()}`)
   return new Promise((resolve, reject) => {
-    execFile(WHISPER, ['-m', modelPath(), '-f', file, '-l', 'auto', '-nt', '-np', '-t', '4'], { timeout: 120000, maxBuffer: 8 * 1048576 },
-      (err, stdout, stderr) => {
-        rmSync(file, { force: true })
-        if (err) return reject(new Error(`Local transcription failed: ${(stderr || err.message).trim().split('\n').pop()}`))
-        resolve(stdout.replace(/\s+/g, ' ').trim())
-      })
+    const child = spawn(WHISPER, ['-m', modelPath(), '-f', file, '-l', 'auto', '-pp', '-np', '-oj', '-of', prefix, '-t', '4'])
+    let err = ''
+    child.stderr.on('data', d => {
+      const s = d.toString()
+      err = (err + s).slice(-2000)
+      for (const m of s.matchAll(/progress =\s*(\d+)%/g)) onProgress({ stage: 'transcribing', pct: Number(m[1]) })
+    })
+    child.stdout.on('data', () => {})
+    child.on('error', e => reject(e))
+    child.on('close', code => {
+      try {
+        if (code !== 0) throw new Error(`On-device transcription failed: ${err.trim().split('\n').pop()}`)
+        const j = JSON.parse(readFileSync(`${prefix}.json`, 'utf8'))
+        resolve((j.transcription ?? []).map((t: { offsets: { from: number }; text: string }) => ({ start: t.offsets.from / 1000, text: t.text.trim() })))
+      } catch (e) { reject(e) } finally { rmSync(`${prefix}.json`, { force: true }) }
+    })
   })
 }
 
-/** Audio arrives as 16 kHz mono WAV from the renderer; works for both engines. */
-export async function transcribeChunk(wav: Buffer, name: string): Promise<string> {
-  if (engine() === 'local') return transcribeLocal(wav)
-  return groqTranscribe(wav, name)
+/** Groq takes up to 25 MB per file: send the WAV in 10-minute pieces. */
+async function transcribeGroqFile(file: string, onProgress: (p: Progress) => void): Promise<Segment[]> {
+  const wav = readFileSync(file)
+  const pcm = wav.subarray(44)
+  const piece = 600 * 16000 * 2
+  const out: Segment[] = []
+  const n = Math.max(1, Math.ceil(pcm.length / piece))
+  for (let i = 0; i < n; i++) {
+    const data = pcm.subarray(i * piece, (i + 1) * piece)
+    const header = Buffer.from(wav.subarray(0, 44))
+    header.writeUInt32LE(36 + data.length, 4); header.writeUInt32LE(data.length, 40)
+    const segs = await transcribeSegments(Buffer.concat([header, data]), `part-${i}.wav`)
+    out.push(...segs.map(s => ({ start: s.start + i * 600, text: s.text })))
+    onProgress({ stage: 'transcribing', pct: Math.round(((i + 1) / n) * 100) })
+  }
+  return out
+}
+
+export function transcribeWav(file: string, onProgress: (p: Progress) => void): Promise<Segment[]> {
+  onProgress({ stage: 'transcribing', pct: 0 })
+  return engine() === 'local' ? transcribeLocalFile(file, onProgress) : transcribeGroqFile(file, onProgress)
 }

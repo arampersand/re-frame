@@ -41,7 +41,7 @@ export function tree(dir = vaultPath()): TreeNode[] {
         children: isDir ? tree(abs) : undefined
       }
     })
-    .filter(n => n.dir || n.name.endsWith('.md') || n.name.endsWith('.pdf'))
+    .filter(n => n.dir || /\.(md|pdf|m4a|wav)$/i.test(n.name))
 }
 
 export const readNote = (rel: string) => readFileSync(inVault(rel), 'utf8')

@@ -47,10 +47,10 @@ const api = {
   },
   audio: {
     start: () => ipcRenderer.invoke('audio:start'),
-    chunk: (rel: string, data: ArrayBuffer, offsetS: number) => ipcRenderer.invoke('audio:chunk', rel, data, offsetS),
-    drain: () => ipcRenderer.invoke('audio:drain'),
+    pcm: (rel: string, data: ArrayBuffer) => ipcRenderer.send('audio:pcm', rel, data),
+    transcribe: (rel: string) => ipcRenderer.invoke('audio:transcribe', rel),
     finish: (rel: string) => ipcRenderer.invoke('audio:finish', rel),
-    onText: on('audio:text')
+    onProgress: on('audio:progress')
   },
   pdf: {
     pick: () => ipcRenderer.invoke('pdf:pick'),

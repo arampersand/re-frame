@@ -3,6 +3,10 @@ import { rf, type TreeNode } from '@/api'
 import { Button, Markdown } from '@/components/ui'
 import { GraphView } from './GraphView'
 
+/** A note recorded in class carries `audio: 08-RECORDINGS/...` in its frontmatter. */
+const audioOf = (path: string, text: string) =>
+  /\.(m4a|wav)$/i.test(path) ? path : text.match(/^audio: (.+\.(?:m4a|wav))$/m)?.[1] ?? null
+
 function Node({ n, depth, selected, onSelect }: { n: TreeNode; depth: number; selected: string | null; onSelect: (p: string) => void }) {
   const [open, setOpen] = useState(depth < 1 || !!selected?.startsWith(n.path + '/'))
   const pad = { paddingLeft: 8 + depth * 14 }
@@ -17,7 +21,7 @@ function Node({ n, depth, selected, onSelect }: { n: TreeNode; depth: number; se
   return (
     <button style={pad} onClick={() => onSelect(n.path)}
       className={`block w-full truncate rounded px-2 py-1 pl-6 text-left text-sm ${selected === n.path ? 'bg-primary text-primary-ink' : 'hover:bg-surface-2'}`}>
-      {n.name.endsWith('.pdf') ? '📄' : '📝'} {n.name.replace(/\.md$/, '')}
+      {n.name.endsWith('.pdf') ? '📄' : /\.(m4a|wav)$/i.test(n.name) ? '🎧' : '📝'} {n.name.replace(/\.md$/, '')}
     </button>
   )
 }
@@ -33,6 +37,7 @@ export function BrainScreen({ selected, onSelect }: { selected: string | null; o
   useEffect(() => {
     if (!selected) { setText(''); return }
     if (selected.endsWith('.pdf')) { setText(`PDF: **${selected}**\n\nIts extracted text and summary live in the \`.md\` with the same name.`); return }
+    if (/\.(m4a|wav)$/i.test(selected)) { setText(''); return }
     rf.vault.read(selected).then(setText).catch(() => setText(`_Note not found: ${selected}_`))
   }, [selected])
 
@@ -65,7 +70,9 @@ export function BrainScreen({ selected, onSelect }: { selected: string | null; o
       ) : (
       <article className="flex-1 overflow-auto px-10 pb-10 pt-10">
         {selected
-          ? <><p className="mb-4 text-xs text-muted">{selected}</p><Markdown text={text} onLink={p => onSelect(p.endsWith('.md') ? p : `${p}.md`)} /></>
+          ? <><p className="mb-4 text-xs text-muted">{selected}</p>
+              {audioOf(selected, text) && <audio controls preload="metadata" className="mb-6 w-full" src={`brain://vault/${encodeURI(audioOf(selected, text)!)}`} />}
+              <Markdown text={text} onLink={p => onSelect(p.endsWith('.md') ? p : `${p}.md`)} /></>
           : <div className="mt-24 text-center text-muted">
               <p className="text-2xl">🧠</p>
               <p className="mt-2">Everything you record, upload and chat lives here as plain notes.</p>
