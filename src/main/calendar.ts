@@ -1,12 +1,12 @@
 // Google Calendar: the app only gets its own "MyBrainBook" calendar (scope calendar.app.created),
 // never the rest of the student's agenda. Deadlines come from 03-DEADLINES.md and are added
 // only after the student approves them.
-import { app, safeStorage, shell } from 'electron'
+import { app, shell } from 'electron'
 import { createServer } from 'node:http'
 import { createHash, randomBytes } from 'node:crypto'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { loadSettings, saveSettings } from './settings'
+import { decryptSecret, encryptSecret, loadSettings, saveSettings } from './settings'
 import { vaultPath } from './vault'
 
 const CLIENT_ID = import.meta.env.MAIN_VITE_GOOGLE_CLIENT_ID ?? ''
@@ -22,8 +22,6 @@ type SyncState = { added: Record<string, string>; ignored: string[] }
 const loadSync = (): SyncState => existsSync(syncFile()) ? JSON.parse(readFileSync(syncFile(), 'utf8')) : { added: {}, ignored: [] }
 const saveSync = (s: SyncState) => writeFileSync(syncFile(), JSON.stringify(s, null, 2))
 
-const enc = (s: string) => (safeStorage.isEncryptionAvailable() ? safeStorage.encryptString(s) : Buffer.from(s)).toString('base64')
-const dec = (s: string) => { const b = Buffer.from(s, 'base64'); return safeStorage.isEncryptionAvailable() ? safeStorage.decryptString(b) : b.toString() }
 
 export function calendarStatus() {
   const s = loadSettings()
@@ -71,7 +69,7 @@ export async function connectCalendar(): Promise<{ ok: boolean; detail: string }
   const tok = await res.json() as { refresh_token?: string; id_token?: string; error_description?: string }
   if (!res.ok || !tok.refresh_token) return { ok: false, detail: tok.error_description ?? 'Google did not return access' }
   const email = tok.id_token ? JSON.parse(Buffer.from(tok.id_token.split('.')[1], 'base64url').toString()).email : null
-  saveSettings({ googleRefreshEnc: enc(tok.refresh_token), googleEmail: email, googleCalendarId: undefined })
+  saveSettings({ googleRefreshEnc: await encryptSecret(tok.refresh_token), googleEmail: email, googleCalendarId: undefined })
   return { ok: true, detail: email ? `Connected as ${email}` : 'Connected' }
 }
 
@@ -82,7 +80,7 @@ async function accessToken(): Promise<string> {
   if (!s.googleRefreshEnc) throw new Error('Connect Google Calendar first')
   const res = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ refresh_token: dec(s.googleRefreshEnc), client_id: CLIENT_ID, client_secret: CLIENT_SECRET, grant_type: 'refresh_token' })
+    body: new URLSearchParams({ refresh_token: await decryptSecret(s.googleRefreshEnc), client_id: CLIENT_ID, client_secret: CLIENT_SECRET, grant_type: 'refresh_token' })
   })
   const j = await res.json() as { access_token?: string; error?: string }
   if (!j.access_token) { if (j.error === 'invalid_grant') disconnectCalendar(); throw new Error('Google access expired. Connect again in Integrations.') }

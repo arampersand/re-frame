@@ -5,7 +5,8 @@ const ENDPOINT = 'https://api.groq.com/openai/v1/audio/transcriptions'
 const MODEL = 'whisper-large-v3-turbo'
 
 /** Verbose transcription with timestamps (seconds). */
-export async function transcribeSegments(audio: Buffer, filename: string, key = getGroqKey()): Promise<{ start: number; text: string }[]> {
+export async function transcribeSegments(audio: Buffer, filename: string): Promise<{ start: number; text: string }[]> {
+  const key = await getGroqKey()
   if (!key) throw new Error('Add your Groq key in Integrations')
   const form = new FormData()
   form.append('file', new Blob([new Uint8Array(audio)]), filename)

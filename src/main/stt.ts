@@ -5,7 +5,7 @@ import { createWriteStream, existsSync, mkdirSync, readFileSync, renameSync, rmS
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
-import { getGroqKey, loadSettings, saveSettings } from './settings'
+import { hasGroqKey, loadSettings, saveSettings } from './settings'
 import { transcribeSegments } from './groq'
 
 export type Engine = 'local' | 'groq'
@@ -30,12 +30,12 @@ export const localReady = () => existsSync(WHISPER) && existsSync(modelPath())
 export function engine(): Engine {
   const s = loadSettings().sttEngine as Engine | undefined
   if (s) return s
-  return getGroqKey() && !localReady() ? 'groq' : 'local'
+  return hasGroqKey() && !localReady() ? 'groq' : 'local'
 }
 
 export function sttStatus() {
   const e = engine()
-  const groqKey = !!getGroqKey()
+  const groqKey = hasGroqKey()
   const local = localReady()
   return {
     engine: e,

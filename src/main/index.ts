@@ -5,12 +5,13 @@ import { ensureVault, tree, readNote, courses, vaultPath, graph, inVault } from 
 import { codexStatus, codexLogin, prepareCodex } from './codex'
 import { testKey } from './groq'
 import { sttStatus, setEngine, downloadModel, type Engine } from './stt'
-import { getGroqKey, setGroqKey } from './settings'
+import { getGroqKey, hasGroqKey, setGroqKey } from './settings'
 import { listChats, getChat, newChat, sendChat, finishLecture } from './brain'
 import { dictate } from './attachments'
 import { startRecording, appendPcm, transcribeRecording, listRecordings, ensureNoteFor } from './recording'
 import { calendarStatus, connectCalendar, disconnectCalendar } from './calendar'
 import { startCalendarMcp } from './mcp-calendar'
+import { listTasks, setTaskStatus, listCourses, getCourse, taskContext, today, calendarEvents } from './dashboard'
 
 // Never die silently: log to ~/Library/Logs/MyBrainBook/main.log instead of crashing.
 import { appendFileSync, mkdirSync } from 'node:fs'
@@ -63,17 +64,24 @@ function registerIpc() {
   ipcMain.handle('codex:status', () => codexStatus())
   ipcMain.handle('codex:login', () => codexLogin())
 
-  ipcMain.handle('groq:status', () => ({ hasKey: !!getGroqKey() }))
+  ipcMain.handle('groq:status', () => ({ hasKey: hasGroqKey() }))
   ipcMain.handle('groq:setKey', async (_e, key: string) => {
     const r = key ? await testKey(key) : { ok: true, detail: 'Key removed' }
-    if (r.ok) setGroqKey(key)
+    if (r.ok) await setGroqKey(key)
     return r
   })
   ipcMain.handle('groq:test', async () => {
-    const key = getGroqKey()
+    const key = await getGroqKey()
     return key ? testKey(key) : { ok: false, detail: 'No key yet' }
   })
 
+  ipcMain.handle('dash:today', () => today())
+  ipcMain.handle('dash:tasks', () => listTasks())
+  ipcMain.handle('dash:taskStatus', (_e, key: string, status: 'done' | 'pending') => setTaskStatus(key, status))
+  ipcMain.handle('dash:taskContext', (_e, key: string) => taskContext(key))
+  ipcMain.handle('dash:courses', () => listCourses())
+  ipcMain.handle('dash:course', (_e, slug: string) => getCourse(slug))
+  ipcMain.handle('dash:calendar', (_e, from: string, to: string) => calendarEvents(from, to))
   ipcMain.handle('calendar:status', () => calendarStatus())
   ipcMain.handle('calendar:connect', () => connectCalendar())
   ipcMain.handle('calendar:disconnect', () => disconnectCalendar())

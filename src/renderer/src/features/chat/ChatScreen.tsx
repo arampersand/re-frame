@@ -17,7 +17,7 @@ const icon = (name: string) =>
   /\.pdf$/i.test(name) ? '📄' : /\.(png|jpe?g|gif|webp|heic|heif|tiff?|bmp)$/i.test(name) ? '🖼️'
     : /\.(m4a|mp3|wav|aac|aiff?|caf|flac|mp4|mov|m4v)$/i.test(name) ? '🎧' : '📎'
 
-export function ChatScreen({ onOpenNote }: { onOpenNote: (p: string) => void }) {
+export function ChatScreen({ onOpenNote, seed }: { onOpenNote: (p: string) => void; seed?: { text: string; n: number } | null }) {
   const [chats, setChats] = useState<ChatMeta[]>([])
   const [chat, setChat] = useState<Chat | null>(null)
   const [input, setInput] = useState('')
@@ -49,9 +49,17 @@ export function ChatScreen({ onOpenNote }: { onOpenNote: (p: string) => void }) 
     ...f, ...paths.filter(p => p && !f.some(x => x.path === p)).map(p => ({ path: p, name: p.split('/').pop()! }))
   ])
 
-  const send = async (text = input) => {
+  // A question sent from Today, Tasks or a course opens a fresh chat and goes out right away.
+  const seeded = useRef<number | null>(null)
+  useEffect(() => {
+    if (!seed || seeded.current === seed.n) return
+    seeded.current = seed.n
+    rf.chat.create().then((c: Chat) => { setChat(c); send(seed.text, c) })
+  }, [seed])
+
+  const send = async (text = input, fresh?: Chat) => {
     if ((!text.trim() && !files.length) || busy) return
-    let c = chat ?? await rf.chat.create()
+    let c = fresh ?? chat ?? await rf.chat.create()
     const attached = files
     setInput(''); setFiles([])
     setBusy(true)

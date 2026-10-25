@@ -39,6 +39,15 @@ const api = {
     setKey: (key: string) => ipcRenderer.invoke('groq:setKey', key),
     test: () => ipcRenderer.invoke('groq:test')
   },
+  dash: {
+    today: () => ipcRenderer.invoke('dash:today'),
+    tasks: () => ipcRenderer.invoke('dash:tasks'),
+    taskStatus: (key: string, status: 'done' | 'pending') => ipcRenderer.invoke('dash:taskStatus', key, status),
+    taskContext: (key: string) => ipcRenderer.invoke('dash:taskContext', key),
+    courses: () => ipcRenderer.invoke('dash:courses'),
+    course: (slug: string) => ipcRenderer.invoke('dash:course', slug),
+    calendar: (from: string, to: string) => ipcRenderer.invoke('dash:calendar', from, to)
+  },
   calendar: {
     status: () => ipcRenderer.invoke('calendar:status'),
     connect: () => ipcRenderer.invoke('calendar:connect'),
