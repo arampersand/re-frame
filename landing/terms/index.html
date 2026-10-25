@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Terms of Service — MyBrainBook</title>
+<meta name="description" content="A free Mac app for students: record your classes, drop your PDFs and chat with everything you've learned. Your notes stay on your Mac." />
+<meta property="og:title" content="MyBrainBook — the second brain for students" />
+<meta property="og:description" content="Record class, drop your PDFs, chat with everything you've learned." />
+<meta property="og:image" content="/icon.png" />
+<link rel="icon" href="/icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0c0d12; --surface: #15171f; --surface-2: #1d2029; --border: #272b36;
+    --text: #eceef4; --muted: #9aa1b2; --primary: #7c5cff; --primary-2: #4b2bd6; --gold: #ffd166; --green: #2fbf71;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: Inter, system-ui, -apple-system, sans-serif; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; letter-spacing: -.01em; }
+  .logo img { width: 34px; height: 34px; }
+  .nav-right { display: flex; align-items: center; gap: 14px; font-size: 14px; color: var(--muted); }
+  .lang { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 6px 10px; font: inherit; cursor: pointer; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; background: var(--primary); color: #fff; font-weight: 600; border-radius: 12px; padding: 14px 22px; font-size: 16px; transition: transform .15s, filter .15s; border: 0; cursor: pointer; }
+  .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn.small { padding: 9px 14px; font-size: 14px; border-radius: 10px; }
+  .btn svg { width: 18px; height: 18px; }
+
+  .hero > *, .grid > * { min-width: 0; }
+  body { overflow-x: hidden; }
+  .hero { display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; padding: 56px 0 72px; }
+  .pill { display: inline-block; font-size: 13px; color: var(--gold); border: 1px solid rgba(255,209,102,.35); background: rgba(255,209,102,.08); padding: 5px 12px; border-radius: 999px; margin-bottom: 22px; }
+  h1 { font-size: clamp(38px, 5.4vw, 62px); line-height: 1.04; letter-spacing: -.035em; font-weight: 800; }
+  h1 em { font-style: normal; background: linear-gradient(90deg, #a48bff, var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { font-size: 19px; color: var(--muted); margin: 22px 0 32px; max-width: 34em; }
+  .cta { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+  .cta-note { font-size: 13px; color: var(--muted); }
+  .cta-note a { text-decoration: underline; }
+  .graph-card { position: relative; aspect-ratio: 1 / .9; border: 1px solid var(--border); border-radius: 24px; background: radial-gradient(circle at 50% 40%, rgba(124,92,255,.18), transparent 65%), var(--surface); overflow: hidden; }
+  .graph-card canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .graph-tag { position: absolute; left: 16px; bottom: 14px; font-size: 12px; color: var(--muted); }
+
+  section { padding: 72px 0; border-top: 1px solid var(--border); }
+  h2 { font-size: clamp(28px, 3.6vw, 40px); letter-spacing: -.025em; line-height: 1.1; font-weight: 800; max-width: 22em; }
+  .sub { color: var(--muted); margin-top: 12px; font-size: 17px; max-width: 40em; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 40px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 26px; }
+  .card .ico { font-size: 26px; }
+  .card h3 { font-size: 19px; margin: 12px 0 6px; letter-spacing: -.01em; }
+  .card p { color: var(--muted); font-size: 15.5px; }
+  .chat { margin-top: 16px; display: grid; gap: 8px; font-size: 14px; }
+  .bubble { padding: 9px 13px; border-radius: 14px; max-width: 92%; }
+  .bubble.me { background: var(--primary); justify-self: end; }
+  .bubble.ai { background: var(--surface-2); }
+  .bubble .link { color: #b9a8ff; background: rgba(124,92,255,.16); border-radius: 6px; padding: 0 5px; }
+  .steps { counter-reset: s; display: grid; gap: 14px; margin-top: 36px; }
+  .step { display: grid; grid-template-columns: 44px 1fr; gap: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 22px; }
+  .step::before { counter-increment: s; content: counter(s); width: 34px; height: 34px; border-radius: 10px; background: rgba(124,92,255,.18); color: #b9a8ff; display: grid; place-items: center; font-weight: 700; }
+  .step h3 { font-size: 17px; margin-bottom: 4px; }
+  .step p { color: var(--muted); font-size: 15px; }
+  code { font-family: ui-monospace, 'JetBrains Mono', Menlo, monospace; font-size: 13.5px; background: var(--surface-2); border: 1px solid var(--border); padding: 2px 7px; border-radius: 6px; color: var(--text); white-space: nowrap; }
+  .rule { display: flex; gap: 18px; align-items: flex-start; background: linear-gradient(135deg, rgba(124,92,255,.14), rgba(255,209,102,.06)); border: 1px solid var(--border); border-radius: 18px; padding: 26px; margin-top: 28px; }
+  .rule .big { font-size: 34px; }
+  .rule p { color: var(--muted); }
+  .final { text-align: center; }
+  .final h2 { margin: 0 auto; }
+  .final .cta { justify-content: center; margin-top: 28px; }
+  footer { border-top: 1px solid var(--border); padding: 28px 0 40px; color: var(--muted); font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  [data-es] { } html[lang="es"] [data-en-only] { display: none; }
+
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; padding-top: 28px; }
+    .grid { grid-template-columns: 1fr; }
+    .nav-right .hide-sm { display: none; }
+    section { padding: 56px 0; }
+  }
+
+  .doc { max-width: 720px; margin: 0 auto; padding: 24px 24px 80px; }
+  .doc h1 { font-size: 36px; margin: 24px 0 8px; }
+  .doc h2 { font-size: 20px; margin: 32px 0 8px; letter-spacing: -.01em; }
+  .doc p, .doc li { color: var(--muted); font-size: 16px; margin: 8px 0; }
+  .doc ul { padding-left: 20px; }
+  .doc a { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="wrap"><nav><a class="logo" href="/"><img src="/icon.png" alt="" />MyBrainBook</a><a class="btn small" href="/">Home</a></nav></div>
+<main class="doc">
+<h1>Terms of Service</h1>
+<p>Last updated: October 24, 2026</p>
+<p>MyBrainBook is a free app made by students during the UTEP hackathon 2026. By using it you agree to these terms.</p>
+<h2>Use</h2>
+<ul>
+<li>Use MyBrainBook to study and organize your own school material. It explains topics; it is not meant to hand in graded work for you. Follow your school's academic integrity rules.</li>
+<li>Only record classes where you are allowed to. Recording rules depend on your school and location.</li>
+<li>You are responsible for the accounts you connect (ChatGPT, Groq, Google) and for following their terms.</li>
+</ul>
+<h2>Your content</h2>
+<p>Your notes, recordings and files are yours and stay on your computer. See the <a href="/privacy">Privacy Policy</a>.</p>
+<h2>No warranty</h2>
+<p>MyBrainBook is provided "as is", without warranties of any kind. AI answers and transcriptions can be wrong: double-check anything important, especially dates in your calendar. We are not liable for missed deadlines, grades or data loss. Keep backups of important files.</p>
+<h2>Changes</h2>
+<p>We may update the app and these terms. Continuing to use the app means you accept the updated terms.</p>
+<h2>Contact</h2>
+<p><a href="mailto:magio@magiobus.com">magio@magiobus.com</a></p>
+</main>
+</body>
+</html>
