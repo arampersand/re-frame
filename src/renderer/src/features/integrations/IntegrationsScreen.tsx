@@ -134,7 +134,7 @@ export function IntegrationsScreen({ onChange }: { onChange: () => void }) {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="flex items-center gap-2 font-semibold"><Dot ok={cal ? cal.connected : null} /> Google Calendar</p>
-              <p className="mt-1 text-sm text-muted">When your brain finds homework, exams or projects, it asks before adding them to a <b>MyBrainBook</b> calendar with reminders. It can only see and edit that calendar, never the rest of yours.</p>
+              <p className="mt-1 text-sm text-muted">Your brain puts classes, exams and homework in a <b>MyBrainBook</b> calendar with reminders, and removes them if plans change. Just tell it in the chat. It can only see and edit that calendar, never the rest of yours.</p>
               {cal?.connected && cal.email && <p className="mt-2 text-xs text-muted">{cal.email} · <button className="underline" onClick={disconnectCal}>Disconnect</button></p>}
               {calBusy && <p className="mt-2 text-xs text-muted">Finish signing in in your browser…</p>}
               {cal && !cal.configured && <p className="mt-2 text-xs text-muted">Available in the next update.</p>}

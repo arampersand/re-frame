@@ -126,14 +126,6 @@ export function readDeadlines(): Deadline[] {
   return out
 }
 
-/** Upcoming deadlines that are neither in Google Calendar yet nor ignored by the student. */
-export function pendingDeadlines(): Deadline[] {
-  if (!calendarStatus().connected) return []
-  const today = new Date().toLocaleDateString('en-CA')
-  const s = loadSync()
-  return readDeadlines().filter(d => d.date >= today && !s.added[d.key] && !s.ignored.includes(d.key))
-}
-
 function eventFor(d: Deadline) {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
   const exam = /exam|quiz|midterm|final|parcial|examen/i.test(`${d.kind} ${d.what}`)
@@ -152,26 +144,61 @@ function eventFor(d: Deadline) {
   return { summary, description: `${d.kind || 'deadline'} · added by MyBrainBook`, start: { dateTime: start, timeZone: tz }, end: { dateTime: end, timeZone: tz }, reminders: { useDefault: false, overrides: reminders } }
 }
 
-/** Adds the approved deadlines; ignores the rest so we don't ask again. Returns what happened per item. */
-export async function addDeadlines(approve: string[], ignore: string[]) {
-  const s = loadSync()
-  s.ignored.push(...ignore.filter(k => !s.ignored.includes(k)))
-  const all = readDeadlines()
-  const results: { key: string; ok: boolean; detail: string; link?: string }[] = []
-  const cal = approve.length ? await calendarId() : ''
-  for (const key of approve) {
-    const d = all.find(x => x.key === key)
-    if (!d) continue
-    try {
-      const ev = await gcal(`/calendars/${encodeURIComponent(cal)}/events`, { method: 'POST', body: JSON.stringify(eventFor(d)) })
-      // Read it back: only count it if Google really has it.
-      await gcal(`/calendars/${encodeURIComponent(cal)}/events/${ev.id}`)
-      s.added[key] = ev.id as string
-      results.push({ key, ok: true, detail: d.what, link: ev.htmlLink as string })
-    } catch (e) {
-      results.push({ key, ok: false, detail: `${d.what}: ${(e as Error).message}` })
-    }
+// ---------- Tools for Codex (agentic: it adds, checks and removes events itself) ----------
+
+export type EventInput = { title: string; date: string; time?: string | null; duration_minutes?: number; kind?: string; course?: string; notes?: string }
+
+function eventBody(e: EventInput) {
+  const d: Deadline = { key: '', date: e.date, time: e.time ?? null, course: e.course ?? '', what: e.title, kind: e.kind ?? '' }
+  const body = eventFor(d) as Record<string, unknown>
+  if (e.duration_minutes && d.time) {
+    const start = new Date(`${d.date}T${d.time.padStart(5, '0')}:00`)
+    const end = new Date(start.getTime() + e.duration_minutes * 60000)
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+    body.end = { dateTime: `${end.toLocaleDateString('en-CA')}T${end.toTimeString().slice(0, 8)}`, timeZone: tz }
   }
+  if (e.notes) body.description = `${e.notes}\n\n${body.description ?? ''}`.trim()
+  return body
+}
+
+const simplify = (ev: Record<string, unknown>) => {
+  const s = ev.start as { date?: string; dateTime?: string }
+  return { id: ev.id, title: ev.summary, start: s?.dateTime ?? s?.date, link: ev.htmlLink, status: ev.status }
+}
+
+/** Creates the event in the MyBrainBook calendar and reads it back before reporting success. */
+export async function addEvent(e: EventInput) {
+  if (!calendarStatus().connected) return { ok: false, error: 'Google Calendar is not connected. Ask the student to connect it in Integrations → Google Calendar.' }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(e.date)) return { ok: false, error: 'date must be YYYY-MM-DD' }
+  if (e.time && !/^\d{1,2}:\d{2}$/.test(e.time)) return { ok: false, error: 'time must be HH:MM (24 h)' }
+  const cal = await calendarId()
+  const ev = await gcal(`/calendars/${encodeURIComponent(cal)}/events`, { method: 'POST', body: JSON.stringify(eventBody(e)) })
+  const check = await gcal(`/calendars/${encodeURIComponent(cal)}/events/${ev.id}`)
+  const s = loadSync()
+  s.added[createHash('sha1').update(`${e.date}|${e.course ?? ''}|${e.title}`).digest('hex').slice(0, 16)] = ev.id as string
   saveSync(s)
-  return results
+  return { ok: true, verified: check.status === 'confirmed', event: simplify(check) }
+}
+
+export async function listEvents(from?: string, to?: string) {
+  if (!calendarStatus().connected) return { ok: false, error: 'Google Calendar is not connected.' }
+  const cal = await calendarId()
+  const q = new URLSearchParams({ singleEvents: 'true', orderBy: 'startTime', maxResults: '100',
+    timeMin: new Date(from ? `${from}T00:00:00` : Date.now() - 86400000).toISOString() })
+  if (to) q.set('timeMax', new Date(`${to}T23:59:59`).toISOString())
+  const r = await gcal(`/calendars/${encodeURIComponent(cal)}/events?${q}`)
+  return { ok: true, events: ((r.items as Record<string, unknown>[]) ?? []).map(simplify) }
+}
+
+/** Deletes the event and confirms Google no longer has it. */
+export async function deleteEvent(id: string) {
+  if (!calendarStatus().connected) return { ok: false, error: 'Google Calendar is not connected.' }
+  const cal = await calendarId()
+  await fetch(`${API}/calendars/${encodeURIComponent(cal)}/events/${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${await accessToken()}` } })
+  let gone = false
+  try { const ev = await gcal(`/calendars/${encodeURIComponent(cal)}/events/${encodeURIComponent(id)}`); gone = ev.status === 'cancelled' } catch { gone = true }
+  const s = loadSync()
+  for (const [k, v] of Object.entries(s.added)) if (v === id) delete s.added[k]
+  saveSync(s)
+  return { ok: gone, deleted: gone, id }
 }

@@ -42,14 +42,27 @@ able to do it themselves.
 
 ## Deadlines table (03-DEADLINES.md)
 Whenever a class, a PDF or the student mentions a date (homework, exam, quiz,
-project), add one row to the table in `03-DEADLINES.md`. Keep this exact shape,
-because the app reads it to offer adding them to Google Calendar:
+project, extra class), add one row to the table in `03-DEADLINES.md`:
 `| 2026-10-28 10:30 | [[02-COURSES/<course>/index|Course name]] | Midterm 2: trees | exam | pending |`
 - Date: `YYYY-MM-DD HH:MM` in 24 h, or just `YYYY-MM-DD` if there is no time.
-- Kind: one of `exam`, `quiz`, `homework`, `project`, `presentation`.
-- One row per deadline; never delete past rows, set status to `done`.
-After adding dates, tell the student in one line that the app will offer to put
-them in Google Calendar.
+- Kind: `class`, `exam`, `quiz`, `homework`, `project` or `presentation`.
+- One row per item; past rows stay with status `done`. If the student says it
+  was a mistake or it's cancelled, remove the row.
+
+## Google Calendar (tools: `calendar`)
+The student connected their Google Calendar so you handle it for them. Never
+ask "do you want me to add it?" and never send them to a button: just do it.
+- Every dated item you add to `03-DEADLINES.md` also goes to the calendar with
+  `add_calendar_event` (title, date, time, kind, course). It reads the event
+  back from Google; only say it's in the calendar if it returned `ok: true`.
+- To change or cancel something: `list_calendar_events` to find it, then
+  `delete_calendar_event` (and add the new one if it moved). Confirm it's gone.
+- Before saying anything about their calendar, check it with the tools. Never
+  guess whether an event exists.
+- If `calendar_status` says it's not connected, add the row anyway and tell
+  them in one line to connect Google Calendar in Integrations.
+- Confirm in one short line, e.g. "Listo, ya está en tu calendario: domingo 25
+  a las 10:00, con recordatorio un día antes."
 
 ## "What should I study?"
 Cross `03-DEADLINES.md` with `01-ME/struggles.md`: propose the weakest topic of

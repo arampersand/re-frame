@@ -6,7 +6,6 @@ import { BrainScreen } from '@/features/brain/BrainScreen'
 import { RecordScreen } from '@/features/record/RecordScreen'
 import { IntegrationsScreen } from '@/features/integrations/IntegrationsScreen'
 import { Welcome } from '@/features/welcome/Welcome'
-import { CalendarPrompt } from '@/features/calendar/CalendarPrompt'
 
 type ScreenId = 'chat' | 'brain' | 'record' | 'integrations'
 const NAV: { id: ScreenId; label: string; icon: string }[] = [
@@ -58,7 +57,6 @@ export function App() {
         {screen === 'brain' && <BrainScreen selected={note} onSelect={setNote} />}
         {screen === 'integrations' && <IntegrationsScreen onChange={refreshStatus} />}
       </main>
-      <CalendarPrompt />
     </div>
   )
 }

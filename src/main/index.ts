@@ -9,7 +9,8 @@ import { getGroqKey, setGroqKey } from './settings'
 import { listChats, getChat, newChat, sendChat, finishLecture } from './brain'
 import { dictate } from './attachments'
 import { startRecording, appendPcm, transcribeRecording, listRecordings, ensureNoteFor } from './recording'
-import { calendarStatus, connectCalendar, disconnectCalendar, pendingDeadlines, addDeadlines } from './calendar'
+import { calendarStatus, connectCalendar, disconnectCalendar } from './calendar'
+import { startCalendarMcp } from './mcp-calendar'
 
 // Never die silently: log to ~/Library/Logs/MyBrainBook/main.log instead of crashing.
 import { appendFileSync, mkdirSync } from 'node:fs'
@@ -76,8 +77,6 @@ function registerIpc() {
   ipcMain.handle('calendar:status', () => calendarStatus())
   ipcMain.handle('calendar:connect', () => connectCalendar())
   ipcMain.handle('calendar:disconnect', () => disconnectCalendar())
-  ipcMain.handle('calendar:pending', () => pendingDeadlines())
-  ipcMain.handle('calendar:add', (_e, approve: string[], ignore: string[]) => addDeadlines(approve, ignore))
 
   ipcMain.handle('stt:status', () => sttStatus())
   ipcMain.handle('stt:setEngine', (_e, engine: Engine) => { setEngine(engine); return sttStatus() })
@@ -99,7 +98,8 @@ function registerIpc() {
   })
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  await startCalendarMcp()
   ensureVault()
   prepareCodex()
   protocol.handle('brain', req => {

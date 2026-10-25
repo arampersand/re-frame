@@ -4,6 +4,7 @@ import { existsSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { delimiter, join } from 'node:path'
 import { vaultPath } from './vault'
+import { MCP_TOKEN, mcpCalendarUrl } from './mcp-calendar'
 
 // Codex ships inside the app (official @openai/codex binaries), so students install nothing.
 const IS_WIN = process.platform === 'win32'
@@ -42,7 +43,7 @@ const PATH = (IS_WIN
   ? [bundledDir, join(codexRoot, 'codex-path'), process.env.PATH ?? process.env.Path ?? '']
   : [...(BUNDLED ? [bundledDir] : []), shellPath(), '/opt/homebrew/bin', '/usr/local/bin', `${homedir()}/.local/bin`, `${homedir()}/.npm-global/bin`, '/usr/bin', '/bin', process.env.PATH ?? ''])
   .filter(Boolean).join(delimiter)
-const env = { ...process.env, PATH, ...(IS_WIN ? { Path: PATH } : {}) }
+const env = { ...process.env, PATH, ...(IS_WIN ? { Path: PATH } : {}), MBB_CALENDAR_TOKEN: MCP_TOKEN }
 
 export type CodexEvent =
   | { kind: 'session'; sessionId: string }
@@ -61,7 +62,12 @@ function describe(cmd: string): string {
 }
 
 export function runCodex(prompt: string, sessionId: string | null, onEvent: (e: CodexEvent) => void, images: string[] = []): Promise<{ sessionId: string | null; text: string }> {
-  const args = ['exec', '--json', '-C', vaultPath(), '-s', 'workspace-write', '--skip-git-repo-check', ...searchArgs()]
+  // --ignore-user-config: students get only MyBrainBook's tools, never whatever is in ~/.codex/config.toml.
+  const cal = mcpCalendarUrl()
+  const calendarArgs = cal ? ['-c', `mcp_servers.calendar.url=${JSON.stringify(cal)}`, '-c', 'mcp_servers.calendar.bearer_token_env_var="MBB_CALENDAR_TOKEN"',
+    // Write tools need pre-approval in exec mode (nobody can click "allow"); the student consented by connecting.
+    '-c', 'mcp_servers.calendar.default_tools_approval_mode="approve"'] : []
+  const args = ['exec', '--json', '-C', vaultPath(), '-s', 'workspace-write', '--skip-git-repo-check', '--ignore-user-config', ...searchArgs(), ...calendarArgs]
   // --image=<path> (not -i <path>): the flag is variadic and would swallow the prompt.
   const img = images.map(p => `--image=${p}`)
   if (sessionId) args.push('resume', sessionId, ...img, prompt)
@@ -91,7 +97,9 @@ export function runCodex(prompt: string, sessionId: string | null, onEvent: (e: 
           } else if (ev.type === 'item.started' && ev.item?.type === 'mcp_tool_call') {
             const a = ev.item.arguments ?? {}
             const what = a.query ?? a.path ?? a.pattern ?? ''
-            const verb = /search/.test(ev.item.tool) ? 'Searching your brain' : /read/.test(ev.item.tool) ? 'Reading' : ev.item.tool
+            const verb = ev.item.tool === 'add_calendar_event' ? '📅 Adding to Google Calendar' : ev.item.tool === 'delete_calendar_event' ? '📅 Removing from Google Calendar'
+              : /calendar/.test(ev.item.tool) ? '📅 Checking your calendar' : /search/.test(ev.item.tool) ? 'Searching your brain' : /read/.test(ev.item.tool) ? 'Reading' : ev.item.tool
+            if (/calendar/.test(ev.item.tool)) { onEvent({ kind: 'command', text: a.title ? `${verb}: ${a.title}` : verb }); continue }
             onEvent({ kind: 'command', text: what ? `${verb}: ${String(what).slice(0, 60)}` : verb })
           } else if (ev.type === 'item.started' && ev.item?.type === 'command_execution') {
             onEvent({ kind: 'command', text: describe(ev.item.command) })

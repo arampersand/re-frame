@@ -42,9 +42,7 @@ const api = {
   calendar: {
     status: () => ipcRenderer.invoke('calendar:status'),
     connect: () => ipcRenderer.invoke('calendar:connect'),
-    disconnect: () => ipcRenderer.invoke('calendar:disconnect'),
-    pending: () => ipcRenderer.invoke('calendar:pending'),
-    add: (approve: string[], ignore: string[]) => ipcRenderer.invoke('calendar:add', approve, ignore)
+    disconnect: () => ipcRenderer.invoke('calendar:disconnect')
   },
   stt: {
     status: () => ipcRenderer.invoke('stt:status'),
