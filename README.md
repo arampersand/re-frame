@@ -10,6 +10,12 @@
 
 The brain is a folder of markdown at `~/Documents/MyBrainBook`. It opens in Obsidian as is. `AGENTS.md` inside it tells the AI how to be a tutor for that student: answer from their material, explain instead of doing graded work, track what they don't get yet.
 
+## Builds
+
+- Mac: `yarn dist` → `release/MyBrainBook-<v>-arm64.dmg` and `-x64.dmg` (ad-hoc signed).
+- Windows: `yarn dist:win` (from a Mac works) → `release/MyBrainBook-Setup-<v>-x64.exe` (unsigned NSIS).
+- Helper binaries (Codex, whisper.cpp, obsidian-mcp) are downloaded by `scripts/` into `vendor/`, never committed.
+
 ## Run it
 
 Requires Node 22+, yarn and the [Codex CLI](https://github.com/openai/codex) logged in with ChatGPT (`codex login`).

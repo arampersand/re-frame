@@ -32,7 +32,7 @@ function createWindow(): void {
     minWidth: 960,
     minHeight: 640,
     title: 'MyBrainBook',
-    titleBarStyle: 'hiddenInset',
+    ...(process.platform === 'darwin' ? { titleBarStyle: 'hiddenInset' as const } : { autoHideMenuBar: true }),
     backgroundColor: '#0f1115',
     webPreferences: { preload: join(__dirname, '../preload/index.js'), sandbox: false, contextIsolation: true }
   })

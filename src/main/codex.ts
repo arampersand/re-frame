@@ -2,19 +2,24 @@ import { app } from 'electron'
 import { spawn, execFile, execFileSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { homedir } from 'node:os'
-import { join } from 'node:path'
+import { delimiter, join } from 'node:path'
 import { vaultPath } from './vault'
 
 // Codex ships inside the app (official @openai/codex binaries), so students install nothing.
-const bundledDir = app.isPackaged
+const IS_WIN = process.platform === 'win32'
+const EXE = IS_WIN ? '.exe' : ''
+// Windows keeps the official layout: bin/codex.exe, codex-resources/ (sandbox helpers), codex-path/rg.exe.
+const codexRoot = app.isPackaged
   ? join(process.resourcesPath, 'codex')
-  : join(app.getAppPath(), 'vendor', 'codex', process.arch)
-const BUNDLED = existsSync(join(bundledDir, 'codex'))
-const CODEX = BUNDLED ? join(bundledDir, 'codex') : 'codex'
+  : IS_WIN ? join(app.getAppPath(), 'vendor', 'win', 'codex') : join(app.getAppPath(), 'vendor', 'codex', process.arch)
+const bundledDir = IS_WIN ? join(codexRoot, 'bin') : codexRoot
+const BUNDLED = existsSync(join(bundledDir, `codex${EXE}`))
+const CODEX = BUNDLED ? join(bundledDir, `codex${EXE}`) : 'codex'
 
 // obsidian-mcp gives Codex BM25-ranked search over the brain (index lives in <brain>/.obsidian-mcp).
 const SEARCH = app.isPackaged
-  ? join(process.resourcesPath, 'obsidian-mcp', 'obsidian-mcp')
+  ? join(process.resourcesPath, 'obsidian-mcp', `obsidian-mcp${EXE}`)
+  : IS_WIN ? join(app.getAppPath(), 'vendor', 'win', 'obsidian-mcp', 'obsidian-mcp.exe')
   : join(app.getAppPath(), 'vendor', 'obsidian-mcp', process.arch, 'obsidian-mcp')
 const searchArgs = () => existsSync(SEARCH)
   ? ['-c', `mcp_servers.brain.command=${JSON.stringify(SEARCH)}`, '-c', `mcp_servers.brain.args=[${JSON.stringify(vaultPath())}]`]
@@ -22,19 +27,22 @@ const searchArgs = () => existsSync(SEARCH)
 
 /** Downloaded apps carry the quarantine flag; clear it on our own helper binaries. */
 export function prepareCodex() {
-  if (!BUNDLED || !app.isPackaged) return
+  if (!BUNDLED || !app.isPackaged || IS_WIN) return
   try { execFileSync('xattr', ['-dr', 'com.apple.quarantine', process.resourcesPath]) } catch { /* not quarantined or read-only */ }
 }
 
 // Apps launched from Finder don't inherit the shell PATH: ask the login shell, plus common spots.
 function shellPath(): string {
+  if (IS_WIN) return ''
   try {
     return execFileSync(process.env.SHELL || '/bin/zsh', ['-ilc', 'printf %s "$PATH"'], { timeout: 4000, encoding: 'utf8' }).trim()
   } catch { return '' }
 }
-const PATH = [...(BUNDLED ? [bundledDir] : []), shellPath(), '/opt/homebrew/bin', '/usr/local/bin', `${homedir()}/.local/bin`, `${homedir()}/.npm-global/bin`, '/usr/bin', '/bin', process.env.PATH ?? '']
-  .filter(Boolean).join(':')
-const env = { ...process.env, PATH }
+const PATH = (IS_WIN
+  ? [bundledDir, join(codexRoot, 'codex-path'), process.env.PATH ?? process.env.Path ?? '']
+  : [...(BUNDLED ? [bundledDir] : []), shellPath(), '/opt/homebrew/bin', '/usr/local/bin', `${homedir()}/.local/bin`, `${homedir()}/.npm-global/bin`, '/usr/bin', '/bin', process.env.PATH ?? ''])
+  .filter(Boolean).join(delimiter)
+const env = { ...process.env, PATH, ...(IS_WIN ? { Path: PATH } : {}) }
 
 export type CodexEvent =
   | { kind: 'session'; sessionId: string }
@@ -45,7 +53,7 @@ export type CodexEvent =
 
 /** Turns a shell command Codex runs into something a student can read. */
 function describe(cmd: string): string {
-  const inner = cmd.replace(/^\/bin\/(z|ba)?sh -lc\s+/, '').replace(/^["']|["']$/g, '')
+  const inner = cmd.replace(/^\/bin\/(z|ba)?sh -lc\s+/, '').replace(/^.*?(powershell|pwsh)(\.exe)?"?\s+(-\w+\s+)*/i, '').replace(/^["']|["']$/g, '')
   const files = inner.match(/[\w./-]+\.(md|pdf)/g)
   if (/^(rg|grep)\b/.test(inner)) return `Searching your brain${files ? `: ${files[0]}` : ''}`
   if (files?.length) return `Reading ${[...new Set(files)].slice(0, 3).join(', ')}`

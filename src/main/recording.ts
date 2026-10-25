@@ -61,6 +61,7 @@ export function stopRecording(rel: string): { wav: string; seconds: number } | n
 
 function toM4a(wavRel: string): Promise<string> {
   const m4a = wavRel.replace(/\.wav$/, '.m4a')
+  if (process.platform !== 'darwin') return Promise.resolve(wavRel)  // afconvert is macOS-only: keep the WAV
   return new Promise(resolve => {
     // afconvert ships with every Mac: AAC 32 kbps mono ≈ 15 MB per hour of class.
     execFile('/usr/bin/afconvert', ['-f', 'm4af', '-d', 'aac', '-b', '32000', inVault(wavRel), inVault(m4a)], err => {
@@ -83,6 +84,7 @@ export async function transcribeRecording(rel: string, onProgress: (p: Progress)
   const isWav = /\.wav$/i.test(wav)
   const src = isWav ? inVault(wav) : join(tmpdir(), `mbb-${randomUUID()}.wav`)
   try {
+    if (!isWav && process.platform !== 'darwin') throw new Error('On Windows only WAV recordings can be transcribed for now')
     if (!isWav) await new Promise<void>((res, rej) => execFile('/usr/bin/afconvert', ['-f', 'WAVE', '-d', 'LEI16@16000', '-c', '1', inVault(wav), src], e => (e ? rej(new Error('Could not read this audio file')) : res())))
     segments = await transcribeWav(src, onProgress)
   } catch (e) {

@@ -10,14 +10,15 @@ import { transcribeSegments } from './groq'
 
 export type Engine = 'local' | 'groq'
 
-// Apple Silicon handles large-v3-turbo in ~1 s per chunk; Intel gets a lighter model to keep up.
-const MODEL = process.arch === 'arm64'
+// Apple Silicon (Metal) handles large-v3-turbo fast; Intel Macs and Windows (CPU) get a lighter model.
+const MODEL = process.arch === 'arm64' && process.platform === 'darwin'
   ? { file: 'ggml-large-v3-turbo-q5_0.bin', label: 'Whisper large-v3 turbo', sizeMB: 547 }
   : { file: 'ggml-small-q5_1.bin', label: 'Whisper small', sizeMB: 181 }
 const MODEL_URL = `https://huggingface.co/ggerganov/whisper.cpp/resolve/main/${MODEL.file}`
 
-const binDir = app.isPackaged ? join(process.resourcesPath, 'whisper') : join(app.getAppPath(), 'vendor', 'whisper', process.arch)
-const WHISPER = join(binDir, 'whisper-cli')
+const binDir = app.isPackaged ? join(process.resourcesPath, 'whisper')
+  : process.platform === 'win32' ? join(app.getAppPath(), 'vendor', 'win', 'whisper') : join(app.getAppPath(), 'vendor', 'whisper', process.arch)
+const WHISPER = join(binDir, process.platform === 'win32' ? 'whisper-cli.exe' : 'whisper-cli')
 const modelsDir = () => join(app.getPath('userData'), 'models')
 const modelPath = () => join(modelsDir(), MODEL.file)
 

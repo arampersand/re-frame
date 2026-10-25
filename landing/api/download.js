@@ -1,4 +1,4 @@
-// /download/arm64 | /download/x64 → short-lived signed link to the DMG in R2.
+// /download/arm64 | /download/x64 | /download/win → short-lived signed link to the installer in R2.
 // The bucket stays private; R2 keys live only in Vercel env vars.
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
@@ -11,8 +11,12 @@ const s3 = new S3Client({
 })
 
 export default async function handler(req, res) {
-  const arch = req.query.arch === 'x64' ? 'x64' : 'arm64'
-  const file = `MyBrainBook-${VERSION}-${arch}.dmg`
+  const files = {
+    arm64: `MyBrainBook-${VERSION}-arm64.dmg`,
+    x64: `MyBrainBook-${VERSION}-x64.dmg`,
+    win: `MyBrainBook-Setup-${VERSION}-x64.exe`
+  }
+  const file = files[req.query.arch] ?? files.arm64
   const url = await getSignedUrl(s3, new GetObjectCommand({
     Bucket: process.env.R2_BUCKET,
     Key: `mybrainbook/${file}`,

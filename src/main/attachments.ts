@@ -45,7 +45,7 @@ async function pdf(src: string, emit: Emit): Promise<string> {
 async function image(src: string, images: string[], emit: Emit): Promise<string> {
   let rel = place('00-INBOX', src)
   // Codex reads common formats; iPhone photos (HEIC) become JPG with macOS sips.
-  if (/\.(heic|heif|tiff?|bmp)$/i.test(rel)) {
+  if (/\.(heic|heif|tiff?|bmp)$/i.test(rel) && process.platform === 'darwin') {
     const jpg = rel.replace(/\.[^.]+$/, '.jpg')
     await run('/usr/bin/sips', ['-s', 'format', 'jpeg', inVault(rel), '--out', inVault(jpg)])
     rmSync(inVault(rel), { force: true })
@@ -61,7 +61,10 @@ async function audio(src: string, emit: Emit, onProgress: (p: Progress) => void)
   const wav = join(tmpdir(), `mbb-${randomUUID()}.wav`)
   emit(`Transcribing ${basename(src)}`)
   try {
-    await run('/usr/bin/afconvert', ['-f', 'WAVE', '-d', 'LEI16@16000', '-c', '1', inVault(rel), wav])
+    if (process.platform !== 'darwin') {
+      if (!/\.wav$/i.test(rel)) throw new Error('not wav')
+      copyFileSync(inVault(rel), wav)
+    } else await run('/usr/bin/afconvert', ['-f', 'WAVE', '-d', 'LEI16@16000', '-c', '1', inVault(rel), wav])
   } catch {
     return `- Audio ${rel} (could not be converted for transcription; ask the student for another format)`
   }
@@ -86,6 +89,7 @@ async function doc(src: string, emit: Emit): Promise<string> {
   const txt = join(tmpdir(), `mbb-${randomUUID()}.txt`)
   try {
     // textutil ships with macOS: Word, RTF, ODT, HTML, Pages → plain text.
+    if (process.platform !== 'darwin') throw new Error('textutil is macOS-only')
     await run('/usr/bin/textutil', ['-convert', 'txt', '-output', txt, inVault(rel)])
     writeNote(md, `---\ntype: reading\ndate: ${today()}\nsource: ${basename(rel)}\ntags: [reading]\n---\n# ${basename(rel)}\n\nOriginal: ![[${rel}]]\n\n## Extracted text\n\n${readFileSync(txt, 'utf8')}\n`)
     return `- Document ${rel} (its text is in ${md})`

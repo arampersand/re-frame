@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "postinstall": "node node_modules/electron/install.js",
     "dist": "node scripts/fetch-codex.mjs && sh scripts/build-whisper.sh && sh scripts/fetch-obsidian-mcp.sh && electron-vite build && electron-builder --mac --arm64 --x64",
-    "fetch-codex": "node scripts/fetch-codex.mjs"
+    "fetch-codex": "node scripts/fetch-codex.mjs",
+    "dist:win": "sh scripts/fetch-win.sh && electron-vite build && electron-builder --win --x64"
   },
   "dependencies": {
     "d3-force": "3.0.0",
@@ -84,6 +85,37 @@
       "artifactName": "MyBrainBook-${version}-${arch}.${ext}",
       "title": "MyBrainBook"
     },
-    "afterPack": "build/adhoc-sign.cjs"
+    "afterPack": "build/adhoc-sign.cjs",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "extraResources": [
+        {
+          "from": "vendor/win/codex",
+          "to": "codex"
+        },
+        {
+          "from": "vendor/win/whisper",
+          "to": "whisper"
+        },
+        {
+          "from": "vendor/win/obsidian-mcp",
+          "to": "obsidian-mcp"
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "artifactName": "MyBrainBook-Setup-${version}-${arch}.${ext}",
+      "shortcutName": "MyBrainBook"
+    }
   }
 }

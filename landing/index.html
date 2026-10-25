@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MyBrainBook — the second brain for students</title>
-<meta name="description" content="A free Mac app for students: record your classes, drop your PDFs and chat with everything you've learned. Your notes stay on your Mac." />
+<meta name="description" content="A free Mac and Windows app for students: record your classes, drop your PDFs and chat with everything you've learned. Your notes stay on your Mac." />
 <meta property="og:title" content="MyBrainBook — the second brain for students" />
 <meta property="og:description" content="Record class, drop your PDFs, chat with everything you've learned." />
 <meta property="og:image" content="/icon.png" />
@@ -95,7 +95,7 @@
 
   <header class="hero">
     <div>
-      <span class="pill" data-en="Free · for Mac · made by students" data-es="Gratis · para Mac · hecha por estudiantes">Free · for Mac · made by students</span>
+      <span class="pill" data-en="Free · Mac &amp; Windows · made by students" data-es="Gratis · Mac y Windows · hecha por estudiantes">Free · Mac &amp; Windows · made by students</span>
       <h1 data-en="Your classes, PDFs and notes in <em>one brain that answers back.</em>" data-es="Tus clases, PDFs y apuntes en <em>un cerebro que te contesta.</em>">Your classes, PDFs and notes in <em>one brain that answers back.</em></h1>
       <p class="lead" data-en="Hit record in class, drop the professor's PDFs, and chat with everything you've learned. MyBrainBook files it all by course and explains it back to you, your way." data-es="Dale grabar en clase, suelta los PDFs del profe y platica con todo lo que has aprendido. MyBrainBook lo acomoda por materia y te lo explica a tu manera.">Hit record in class, drop the professor's PDFs, and chat with everything you've learned. MyBrainBook files it all by course and explains it back to you, your way.</p>
       <div class="cta" id="download">
@@ -139,7 +139,7 @@
       <div class="card">
         <div class="ico">🕸️</div>
         <h3 data-en="See how it all connects" data-es="Mira cómo se conecta todo">See how it all connects</h3>
-        <p data-en="Courses, professors, classes, readings and assignments as a living graph. Your notes are plain markdown on your Mac. They open in Obsidian too." data-es="Materias, profes, clases, lecturas y tareas como un grafo vivo. Tus notas son markdown en tu Mac. También abren en Obsidian.">Courses, professors, classes, readings and assignments as a living graph. Your notes are plain markdown on your Mac. They open in Obsidian too.</p>
+        <p data-en="Courses, professors, classes, readings and assignments as a living graph. Your notes are plain markdown on your computer. They open in Obsidian too." data-es="Materias, profes, clases, lecturas y tareas como un grafo vivo. Tus notas son markdown en tu Mac. También abren en Obsidian.">Courses, professors, classes, readings and assignments as a living graph. Your notes are plain markdown on your Mac. They open in Obsidian too.</p>
       </div>
     </div>
     <div class="rule">
@@ -159,11 +159,11 @@
     <div class="steps">
       <div class="step"><div>
         <h3 data-en="Download and drag to Applications" data-es="Descarga y arrastra a Aplicaciones">Download and drag to Applications</h3>
-        <p data-en="Pick Apple Silicon (M1–M4) or Intel. Not sure? Apple menu → About This Mac." data-es="Elige Apple Silicon (M1–M4) o Intel. ¿No sabes? Menú Apple → Acerca de esta Mac.">Pick Apple Silicon (M1–M4) or Intel. Not sure? Apple menu → About This Mac.</p>
+        <p data-en="Mac: pick Apple Silicon (M1–M4) or Intel (Apple menu → About This Mac). Windows: run the installer." data-es="Mac: elige Apple Silicon (M1–M4) o Intel (menú Apple → Acerca de esta Mac). Windows: abre el instalador.">Mac: pick Apple Silicon (M1–M4) or Intel (Apple menu → About This Mac). Windows: run the installer.</p>
       </div></div>
       <div class="step"><div>
         <h3 data-en="Open it the first time" data-es="Ábrela la primera vez">Open it the first time</h3>
-        <p data-en="We're not Apple-notarized yet, so macOS asks. Right-click the app → Open. On newer macOS: System Settings → Privacy &amp; Security → Open Anyway." data-es="Aún no estamos notarizados por Apple, así que macOS pregunta. Clic derecho en la app → Abrir. En macOS nuevo: Ajustes del Sistema → Privacidad y seguridad → Abrir de todos modos.">We're not Apple-notarized yet, so macOS asks. Right-click the app → Open. On newer macOS: System Settings → Privacy &amp; Security → Open Anyway.</p>
+        <p data-en="We're not signed by Apple or Microsoft yet, so your computer asks. Mac: right-click the app → Open (or System Settings → Privacy &amp; Security → Open Anyway). Windows: in the blue SmartScreen box, More info → Run anyway." data-es="Aún no estamos firmados por Apple ni Microsoft, así que tu compu pregunta. Mac: clic derecho en la app → Abrir (o Ajustes del Sistema → Privacidad y seguridad → Abrir de todos modos). Windows: en el recuadro azul de SmartScreen, Más información → Ejecutar de todas formas.">We're not Apple-notarized yet, so macOS asks. Right-click the app → Open. On newer macOS: System Settings → Privacy &amp; Security → Open Anyway.</p>
       </div></div>
       <div class="step"><div>
         <h3 data-en="Click &ldquo;Connect with ChatGPT&rdquo;" data-es="Dale a &ldquo;Connect with ChatGPT&rdquo;">Click &ldquo;Connect with ChatGPT&rdquo;</h3>
@@ -195,26 +195,27 @@
 </div>
 
 <script>
-  // ---- Downloads: set DOWNLOAD_BASE to the public R2 URL once uploaded ----
-  const DOWNLOAD_BASE = '/download';
-  const VERSION = '0.2.0';
-  const files = { arm64: 'arm64', x64: 'x64' };
+  // ---- Downloads: /download/<target> redirects to a signed R2 link ----
+  const TARGETS = {
+    arm64: { en: 'Mac · Apple Silicon (M1–M4)', es: 'Mac · Apple Silicon (M1–M4)', os: 'mac' },
+    x64: { en: 'Mac · Intel', es: 'Mac · Intel', os: 'mac' },
+    win: { en: 'Windows 10/11 (64-bit)', es: 'Windows 10/11 (64-bit)', os: 'win' }
+  };
 
-  function isAppleSilicon() {
+  function detect() {
+    const ua = navigator.userAgent || '';
+    if (/Windows/i.test(ua)) return 'win';
     try {
       const gl = document.createElement('canvas').getContext('webgl');
       const ext = gl && gl.getExtension('WEBGL_debug_renderer_info');
       const r = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : '';
-      if (/Apple M\d|Apple GPU/i.test(r)) return true;
-      if (/Intel|AMD|Radeon/i.test(r)) return false;
+      if (/Intel|AMD|Radeon/i.test(r) && !/Apple/i.test(r)) return 'x64';
     } catch (e) {}
-    return true; // most Macs sold since 2020
+    return 'arm64';
   }
-  const T = {
-    en: { arm: 'For Apple Silicon (M1–M4)', intel: 'For Intel Macs', altArm: 'Need the Intel version?', altIntel: 'Need the Apple Silicon version?', soon: 'Download link coming in minutes' },
-    es: { arm: 'Para Apple Silicon (M1–M4)', intel: 'Para Mac con Intel', altArm: '¿Necesitas la versión Intel?', altIntel: '¿Necesitas la versión Apple Silicon?', soon: 'El link de descarga sale en unos minutos' }
-  };
-  let arch = isAppleSilicon() ? 'arm64' : 'x64';
+  const APPLE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.02-1.5-2.62-1.7-3.19-1.73-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.62 1.11 8.79.73 1.06 1.6 2.25 2.75 2.21 1.1-.04 1.52-.71 2.85-.71 1.33 0 1.7.71 2.87.69 1.18-.02 1.93-1.08 2.66-2.15.84-1.23 1.18-2.42 1.2-2.48-.03-.01-2.3-.88-2.3-3.54zM14.2 6.13c.6-.74 1.01-1.76.9-2.78-.87.04-1.93.58-2.55 1.31-.56.65-1.05 1.69-.92 2.69.97.07 1.96-.49 2.57-1.22z"/></svg>';
+  const WINDOWS = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5 10.5 4.4v7.1H3V5.5zm0 13 7.5 1.1v-7H3v5.9zM11.5 4.3 21 3v8.5h-9.5V4.3zm0 15.4L21 21v-8.4h-9.5v7.1z"/></svg>';
+  let target = detect();
   let lang = (navigator.language || 'en').startsWith('es') ? 'es' : 'en';
   try { lang = localStorage.getItem('mbb-lang') || lang } catch (e) {}
 
@@ -222,18 +223,20 @@
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-en]').forEach(el => { el.innerHTML = el.dataset[lang] });
     document.getElementById('lang').textContent = lang === 'en' ? 'ES' : 'EN';
-    const t = T[lang];
-    const href = DOWNLOAD_BASE ? `${DOWNLOAD_BASE}/${files[arch]}` : '#setup';
-    document.querySelectorAll('.btn.dl:not(.small)').forEach(a => a.href = href);
+    const win = TARGETS[target].os === 'win';
+    const label = lang === 'es' ? (win ? 'Descargar para Windows' : 'Descargar para Mac') : (win ? 'Download for Windows' : 'Download for Mac');
+    document.querySelectorAll('.btn.dl:not(.small)').forEach(a => {
+      a.href = `/download/${target}`;
+      const svg = a.querySelector('svg'); if (svg) svg.outerHTML = win ? WINDOWS : APPLE;
+      const l = a.querySelector('.dl-label'); if (l) l.textContent = label;
+    });
     document.querySelector('.btn.small.dl').href = '#download';
-    document.querySelector('.arch-note').textContent = DOWNLOAD_BASE ? (arch === 'arm64' ? t.arm : t.intel) : t.soon;
-    const alt = document.querySelector('.alt-dl');
-    alt.textContent = arch === 'arm64' ? t.altArm : t.altIntel;
-    alt.style.display = DOWNLOAD_BASE ? '' : 'none';
-    alt.parentElement.childNodes[1].textContent = DOWNLOAD_BASE ? ' · ' : '';
+    document.querySelector('.arch-note').textContent = TARGETS[target][lang];
+    const others = Object.keys(TARGETS).filter(k => k !== target)
+      .map(k => `<a href="/download/${k}">${TARGETS[k][lang]}</a>`).join(' · ');
+    document.querySelector('.alt-dl').outerHTML = `<span class="alt-dl">${lang === 'es' ? 'También para' : 'Also for'} ${others}</span>`;
   }
   document.getElementById('lang').onclick = () => { lang = lang === 'en' ? 'es' : 'en'; try { localStorage.setItem('mbb-lang', lang) } catch (e) {} render() };
-  document.querySelector('.alt-dl').onclick = e => { e.preventDefault(); arch = arch === 'arm64' ? 'x64' : 'arm64'; render() };
   render();
 
   // ---- Hero graph: a small force layout with generic school notes ----
