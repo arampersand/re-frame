@@ -36,6 +36,17 @@ able to do it themselves.
   exactly confused them) and to the "Weak topics" section of that course's
   `index.md`. When they show they got it, mark it as resolved there.
 
+## Deadlines table (03-DEADLINES.md)
+Whenever a class, a PDF or the student mentions a date (homework, exam, quiz,
+project), add one row to the table in `03-DEADLINES.md`. Keep this exact shape,
+because the app reads it to offer adding them to Google Calendar:
+`| 2026-10-28 10:30 | [[02-COURSES/<course>/index|Course name]] | Midterm 2: trees | exam | pending |`
+- Date: `YYYY-MM-DD HH:MM` in 24 h, or just `YYYY-MM-DD` if there is no time.
+- Kind: one of `exam`, `quiz`, `homework`, `project`, `presentation`.
+- One row per deadline; never delete past rows, set status to `done`.
+After adding dates, tell the student in one line that the app will offer to put
+them in Google Calendar.
+
 ## "What should I study?"
 Cross `03-DEADLINES.md` with `01-ME/struggles.md`: propose the weakest topic of
 the closest exam or deadline, how long (25-50 min), and which notes to open.

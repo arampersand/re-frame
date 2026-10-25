@@ -19,6 +19,13 @@ yarn
 yarn dev
 ```
 
+Google Calendar needs an OAuth client (Desktop app) in `.env.local`, never committed:
+
+```
+MAIN_VITE_GOOGLE_CLIENT_ID=...
+MAIN_VITE_GOOGLE_CLIENT_SECRET=...
+```
+
 First launch creates `~/Documents/MyBrainBook` from `seed/vault` (an empty template). Add your Groq key in **Integrations** to record classes.
 
 ## How it's built

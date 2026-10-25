@@ -3,7 +3,10 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 
-type Settings = { vaultPath: string; groqKeyEnc?: string; sttEngine?: 'local' | 'groq' }
+type Settings = {
+  vaultPath: string; groqKeyEnc?: string; sttEngine?: 'local' | 'groq'
+  googleRefreshEnc?: string; googleEmail?: string | null; googleCalendarId?: string
+}
 
 const file = () => join(app.getPath('userData'), 'settings.json')
 

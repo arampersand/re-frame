@@ -8,6 +8,7 @@ import { sttStatus, setEngine, downloadModel, type Engine } from './stt'
 import { getGroqKey, setGroqKey } from './settings'
 import { listChats, getChat, newChat, sendChat, finishLecture, importPdf } from './brain'
 import { startRecording, appendPcm, transcribeRecording } from './recording'
+import { calendarStatus, connectCalendar, disconnectCalendar, pendingDeadlines, addDeadlines } from './calendar'
 
 // Never die silently: log to ~/Library/Logs/MyBrainBook/main.log instead of crashing.
 import { appendFileSync, mkdirSync } from 'node:fs'
@@ -68,6 +69,12 @@ function registerIpc() {
     const key = getGroqKey()
     return key ? testKey(key) : { ok: false, detail: 'No key yet' }
   })
+
+  ipcMain.handle('calendar:status', () => calendarStatus())
+  ipcMain.handle('calendar:connect', () => connectCalendar())
+  ipcMain.handle('calendar:disconnect', () => disconnectCalendar())
+  ipcMain.handle('calendar:pending', () => pendingDeadlines())
+  ipcMain.handle('calendar:add', (_e, approve: string[], ignore: string[]) => addDeadlines(approve, ignore))
 
   ipcMain.handle('stt:status', () => sttStatus())
   ipcMain.handle('stt:setEngine', (_e, engine: Engine) => { setEngine(engine); return sttStatus() })

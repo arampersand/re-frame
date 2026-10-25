@@ -30,14 +30,25 @@ export function IntegrationsScreen({ onChange }: { onChange: () => void }) {
   const [msg, setMsg] = useState<{ ok: boolean; detail: string } | null>(null)
   const [busy, setBusy] = useState(false)
   const [pct, setPct] = useState<number | null>(null)
+  const [cal, setCal] = useState<{ configured: boolean; connected: boolean; email: string | null } | null>(null)
+  const [calMsg, setCalMsg] = useState<{ ok: boolean; detail: string } | null>(null)
+  const [calBusy, setCalBusy] = useState(false)
 
   const refresh = () => {
     rf.codex.status().then(setCodex)
+    rf.calendar.status().then(setCal)
     rf.stt.status().then((s: Stt) => { setStt(s); if (s.local.download && !s.local.download.error) setPct(s.local.download.pct) })
     onChange()
   }
   useEffect(refresh, [])
   useEffect(() => listen(rf.stt.onProgress, (p: number) => setPct(p)), [])
+
+  const connectCal = async () => {
+    setCalBusy(true); setCalMsg(null)
+    setCalMsg(await rf.calendar.connect())
+    setCalBusy(false); refresh()
+  }
+  const disconnectCal = async () => { await rf.calendar.disconnect(); setCalMsg(null); refresh() }
 
   const login = async () => { setBusy(true); await rf.codex.login(); setBusy(false); refresh() }
 
@@ -119,9 +130,25 @@ export function IntegrationsScreen({ onChange }: { onChange: () => void }) {
           {msg && <p className={`mt-3 rounded-lg px-3 py-2 text-sm ${msg.ok ? 'bg-mastered/15 text-mastered' : 'bg-gap/15 text-gap'}`}>{msg.detail}</p>}
         </Card>
 
+        <Card>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="flex items-center gap-2 font-semibold"><Dot ok={cal ? cal.connected : null} /> Google Calendar</p>
+              <p className="mt-1 text-sm text-muted">When your brain finds homework, exams or projects, it asks before adding them to a <b>MyBrainBook</b> calendar with reminders. It can only see and edit that calendar, never the rest of yours.</p>
+              {cal?.connected && cal.email && <p className="mt-2 text-xs text-muted">{cal.email} · <button className="underline" onClick={disconnectCal}>Disconnect</button></p>}
+              {calBusy && <p className="mt-2 text-xs text-muted">Finish signing in in your browser…</p>}
+              {cal && !cal.configured && <p className="mt-2 text-xs text-muted">Available in the next update.</p>}
+            </div>
+            {cal?.connected
+              ? <span className="rounded-full bg-mastered/20 px-3 py-1 text-xs text-mastered">Connected</span>
+              : <Button onClick={connectCal} disabled={calBusy || !cal?.configured}>Connect</Button>}
+          </div>
+          {calMsg && <p className={`mt-3 rounded-lg px-3 py-2 text-sm ${calMsg.ok ? 'bg-mastered/15 text-mastered' : 'bg-gap/15 text-gap'}`}>{calMsg.detail}</p>}
+        </Card>
+
         <Card className="opacity-60">
           <p className="font-semibold">Coming soon</p>
-          <p className="mt-1 text-sm text-muted">Blackboard / Canvas / Moodle calendar · Google Calendar · Google Drive</p>
+          <p className="mt-1 text-sm text-muted">Blackboard / Canvas / Moodle calendar · Google Drive</p>
         </Card>
       </div>
     </div>
