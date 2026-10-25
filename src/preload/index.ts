@@ -67,6 +67,7 @@ const api = {
     pcm: (rel: string, data: ArrayBuffer) => ipcRenderer.send('audio:pcm', rel, data),
     transcribe: (rel: string) => ipcRenderer.invoke('audio:transcribe', rel),
     finish: (rel: string) => ipcRenderer.invoke('audio:finish', rel),
+    followup: (sessionId: string | null, text: string) => ipcRenderer.invoke('audio:followup', sessionId, text),
     onProgress: on('audio:progress')
   },
   files: {

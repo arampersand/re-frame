@@ -2,7 +2,7 @@ import { app, BrowserWindow, dialog, ipcMain, net, protocol, session, shell } fr
 import { pathToFileURL } from 'node:url'
 import { join } from 'node:path'
 import { ensureVault, tree, readNote, courses, vaultPath, graph, inVault } from './vault'
-import { codexStatus, codexLogin, prepareCodex } from './codex'
+import { codexStatus, codexLogin, prepareCodex, runCodex } from './codex'
 import { testKey } from './groq'
 import { sttStatus, setEngine, downloadModel, type Engine } from './stt'
 import { getGroqKey, hasGroqKey, setGroqKey } from './settings'
@@ -98,6 +98,7 @@ function registerIpc() {
   ipcMain.handle('audio:start', () => startRecording())
   ipcMain.on('audio:pcm', (_e, rel: string, data: ArrayBuffer) => appendPcm(rel, Buffer.from(data)))
   ipcMain.handle('audio:transcribe', (_e, rel: string) => transcribeRecording(rel, p => send('audio:progress', { rel, ...p })))
+  ipcMain.handle('audio:followup', (_e, sessionId: string | null, text: string) => runCodex(text, sessionId, ev => send('task:event', { task: 'lecture', ...ev })))
   ipcMain.handle('audio:finish', (_e, rel: string) => finishLecture(rel, ev => send('task:event', { task: 'lecture', ...ev })))
 
   ipcMain.handle('files:pick', async () => {
