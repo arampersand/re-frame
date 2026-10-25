@@ -6,8 +6,9 @@ import { codexStatus, codexLogin, prepareCodex } from './codex'
 import { testKey } from './groq'
 import { sttStatus, setEngine, downloadModel, type Engine } from './stt'
 import { getGroqKey, setGroqKey } from './settings'
-import { listChats, getChat, newChat, sendChat, finishLecture, importPdf } from './brain'
-import { startRecording, appendPcm, transcribeRecording } from './recording'
+import { listChats, getChat, newChat, sendChat, finishLecture } from './brain'
+import { dictate } from './attachments'
+import { startRecording, appendPcm, transcribeRecording, listRecordings, ensureNoteFor } from './recording'
 import { calendarStatus, connectCalendar, disconnectCalendar, pendingDeadlines, addDeadlines } from './calendar'
 
 // Never die silently: log to ~/Library/Logs/MyBrainBook/main.log instead of crashing.
@@ -54,7 +55,9 @@ function registerIpc() {
   ipcMain.handle('chat:list', () => listChats())
   ipcMain.handle('chat:get', (_e, id: string) => getChat(id))
   ipcMain.handle('chat:new', () => newChat())
-  ipcMain.handle('chat:send', (_e, id: string, text: string) => sendChat(id, text, ev => send('chat:event', { chatId: id, ...ev })))
+  ipcMain.handle('chat:send', (_e, id: string, text: string, files: string[] = []) =>
+    sendChat(id, text, files, ev => send('chat:event', { chatId: id, ...ev }), p => send('chat:event', { chatId: id, kind: 'progress', text: `${p.pct}%` })))
+  ipcMain.handle('stt:dictate', (_e, pcm: ArrayBuffer) => dictate(Buffer.from(pcm)))
 
   ipcMain.handle('codex:status', () => codexStatus())
   ipcMain.handle('codex:login', () => codexLogin())
@@ -80,19 +83,19 @@ function registerIpc() {
   ipcMain.handle('stt:setEngine', (_e, engine: Engine) => { setEngine(engine); return sttStatus() })
   ipcMain.handle('stt:download', () => downloadModel(pct => send('stt:progress', pct)))
 
+  ipcMain.handle('audio:list', () => listRecordings())
+  ipcMain.handle('audio:retry', (_e, audio: string) => {
+    const rel = ensureNoteFor(audio)
+    return transcribeRecording(rel, p => send('audio:progress', { rel, ...p })).then(r => ({ ...r, rel }))
+  })
   ipcMain.handle('audio:start', () => startRecording())
   ipcMain.on('audio:pcm', (_e, rel: string, data: ArrayBuffer) => appendPcm(rel, Buffer.from(data)))
   ipcMain.handle('audio:transcribe', (_e, rel: string) => transcribeRecording(rel, p => send('audio:progress', { rel, ...p })))
   ipcMain.handle('audio:finish', (_e, rel: string) => finishLecture(rel, ev => send('task:event', { task: 'lecture', ...ev })))
 
-  ipcMain.handle('pdf:pick', async () => {
-    const r = await dialog.showOpenDialog(win!, { properties: ['openFile', 'multiSelections'], filters: [{ name: 'PDF', extensions: ['pdf'] }] })
+  ipcMain.handle('files:pick', async () => {
+    const r = await dialog.showOpenDialog(win!, { properties: ['openFile', 'multiSelections'] })
     return r.canceled ? [] : r.filePaths
-  })
-  ipcMain.handle('pdf:import', async (_e, paths: string[]) => {
-    const out: string[] = []
-    for (const p of paths) out.push((await importPdf(p, ev => send('task:event', { task: 'pdf', ...ev }))).text)
-    return out
   })
 }
 

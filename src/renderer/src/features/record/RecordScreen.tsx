@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { rf, listen, type CodexEvent } from '@/api'
 import { Button, Card, Markdown } from '@/components/ui'
 import { usePcmRecorder } from './usePcmRecorder'
+import { RecordingHistory } from './RecordingHistory'
 
 type Stt = { engine: 'local' | 'groq'; ready: boolean }
 type Phase = 'idle' | 'recording' | 'transcribing' | 'filing' | 'done' | 'failed'
@@ -17,6 +18,7 @@ export function RecordScreen({ onOpenNote, onSetup }: { onOpenNote: (p: string) 
   const [result, setResult] = useState('')
   const [error, setError] = useState('')
   const rel = useRef<string | null>(null)
+  const [tick, setTick] = useState(0)
 
   const rec = usePcmRecorder(pcm => { if (rel.current) rf.audio.pcm(rel.current, pcm) })
 
@@ -42,6 +44,7 @@ export function RecordScreen({ onOpenNote, onSetup }: { onOpenNote: (p: string) 
       rel.current = await rf.audio.start()
       await rec.start()
       setPhase('recording')
+      setTick(t => t + 1)
     } catch (e) {
       setError(`Could not use the microphone: ${(e as Error).message}. Allow it in System Settings → Privacy & Security → Microphone.`)
       setPhase('idle')
@@ -55,12 +58,14 @@ export function RecordScreen({ onOpenNote, onSetup }: { onOpenNote: (p: string) 
     if (!t.ok) {
       setError(`${t.detail} Your audio is saved, nothing was lost.`)
       setPhase('failed')
+      setTick(t => t + 1)
       return
     }
     setPhase('filing')
     const r = await rf.audio.finish(rel.current!)
     setResult(r.text || 'Done. Check the class in My brain.')
     setPhase('done')
+    setTick(t => t + 1)
   }
 
   const busy = phase === 'transcribing' || phase === 'filing'
@@ -121,6 +126,7 @@ export function RecordScreen({ onOpenNote, onSetup }: { onOpenNote: (p: string) 
             {result && <div className="mt-3"><Markdown text={result} onLink={onOpenNote} /></div>}
           </Card>
         )}
+        <RecordingHistory refresh={tick} onOpenNote={onOpenNote} />
       </div>
     </div>
   )

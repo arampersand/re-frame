@@ -27,7 +27,7 @@ const api = {
     list: () => ipcRenderer.invoke('chat:list'),
     get: (id: string) => ipcRenderer.invoke('chat:get', id),
     create: () => ipcRenderer.invoke('chat:new'),
-    send: (id: string, text: string) => ipcRenderer.invoke('chat:send', id, text),
+    send: (id: string, text: string, files: string[] = []) => ipcRenderer.invoke('chat:send', id, text, files),
     onEvent: on('chat:event')
   },
   codex: {
@@ -50,18 +50,20 @@ const api = {
     status: () => ipcRenderer.invoke('stt:status'),
     setEngine: (engine: 'local' | 'groq') => ipcRenderer.invoke('stt:setEngine', engine),
     download: () => ipcRenderer.invoke('stt:download'),
-    onProgress: on('stt:progress')
+    onProgress: on('stt:progress'),
+    dictate: (pcm: ArrayBuffer) => ipcRenderer.invoke('stt:dictate', pcm)
   },
   audio: {
+    list: () => ipcRenderer.invoke('audio:list'),
+    retry: (audio: string) => ipcRenderer.invoke('audio:retry', audio),
     start: () => ipcRenderer.invoke('audio:start'),
     pcm: (rel: string, data: ArrayBuffer) => ipcRenderer.send('audio:pcm', rel, data),
     transcribe: (rel: string) => ipcRenderer.invoke('audio:transcribe', rel),
     finish: (rel: string) => ipcRenderer.invoke('audio:finish', rel),
     onProgress: on('audio:progress')
   },
-  pdf: {
-    pick: () => ipcRenderer.invoke('pdf:pick'),
-    import: (paths: string[]) => ipcRenderer.invoke('pdf:import', paths),
+  files: {
+    pick: () => ipcRenderer.invoke('files:pick'),
     pathFor: (file: File) => webUtils.getPathForFile(file)
   },
   onTask: on('task:event'),

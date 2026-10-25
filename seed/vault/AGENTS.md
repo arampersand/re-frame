@@ -7,8 +7,12 @@ You read it, you answer from it, and you keep it organized.
 ## Before every answer
 1. Read `01-ME/profile.md` (who they are, how they like explanations) and
    `01-ME/struggles.md` (what they are stuck on right now).
-2. Search their own material first: `02-COURSES/<course>/lectures/`,
-   `readings/`, `notes/` and `03-DEADLINES.md`. Use `rg` to find things fast.
+2. Search their own material first with the `brain` MCP tools: `search_text`
+   (BM25, ranked by relevance, handles accents and plurals) to find notes, then
+   read them. Use `search_metadata` for frontmatter (course, type, date) and
+   `rg` only as a fallback for exact strings or regex. Look in
+   `02-COURSES/<course>/lectures/`, `readings/`, `notes/`, `assignments/` and
+   `03-DEADLINES.md`.
 3. Cite the note you used with a wikilink, e.g.
    `[[02-COURSES/<course>/lectures/2026-10-22-<topic>]]`.
    If the answer is not in their brain, say so before using general knowledge.

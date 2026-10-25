@@ -1,8 +1,11 @@
 // Class recordings: 16 kHz mono PCM streamed to a WAV on disk while recording (nothing is lost if
 // the app closes), transcribed once at the end, then compressed to .m4a and kept in 08-RECORDINGS.
 import { execFile } from 'node:child_process'
-import { closeSync, existsSync, fstatSync, openSync, readFileSync, rmSync, writeSync } from 'node:fs'
-import { inVault, writeNote } from './vault'
+import { closeSync, existsSync, fstatSync, openSync, readFileSync, readdirSync, rmSync, statSync, writeSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join, relative } from 'node:path'
+import { randomUUID } from 'node:crypto'
+import { inVault, vaultPath, writeNote } from './vault'
 import { transcribeWav, type Progress } from './stt'
 
 const RATE = 16000
@@ -77,20 +80,83 @@ export async function transcribeRecording(rel: string, onProgress: (p: Progress)
   if (done && done.seconds < 2) return { ok: false, detail: 'The recording is too short.', lines: 0 }
 
   let segments: { start: number; text: string }[]
+  const isWav = /\.wav$/i.test(wav)
+  const src = isWav ? inVault(wav) : join(tmpdir(), `mbb-${randomUUID()}.wav`)
   try {
-    segments = await transcribeWav(inVault(wav), onProgress)
+    if (!isWav) await new Promise<void>((res, rej) => execFile('/usr/bin/afconvert', ['-f', 'WAVE', '-d', 'LEI16@16000', '-c', '1', inVault(wav), src], e => (e ? rej(new Error('Could not read this audio file')) : res())))
+    segments = await transcribeWav(src, onProgress)
   } catch (e) {
     // Keep the audio: the student can retry later from the note.
     writeNote(rel, note.replace('status: recording', 'status: not-transcribed'))
     return { ok: false, detail: (e as Error).message, lines: 0 }
+  } finally {
+    if (!isWav) rmSync(src, { force: true })
   }
   onProgress({ stage: 'saving', pct: 100 })
-  const audio = await toM4a(wav)
+  const audio = isWav ? await toM4a(wav) : wav
   const transcript = segments.filter(s => s.text).map(s => `[${stamp(s.start)}] ${s.text}`).join('\n')
   writeNote(rel, note
-    .replace('status: recording', 'status: raw')
+    .replace(/status: (recording|not-transcribed)/, 'status: raw')
     .replaceAll(wav, audio)
     .replace(/## Transcript\n[\s\S]*$/, `## Transcript\n${transcript}\n`))
   return { ok: segments.some(s => s.text), detail: segments.length ? 'Transcribed' : 'No speech found', lines: segments.length }
 }
 
+
+// ---------- History ----------
+
+export type RecordingItem = {
+  audio: string; note: string | null; title: string; date: string; sizeMB: number
+  status: 'recording' | 'not-transcribed' | 'transcribed' | 'filed'; course: string | null
+}
+
+function allNotes(dir = vaultPath(), out: string[] = []): string[] {
+  for (const n of readdirSync(dir)) {
+    if (n.startsWith('.') || n === '04-CHATS' || n === '08-RECORDINGS') continue
+    const abs = join(dir, n)
+    if (statSync(abs).isDirectory()) allNotes(abs, out)
+    else if (n.endsWith('.md')) out.push(abs)
+  }
+  return out
+}
+
+/** Every recording with where its note is: not transcribed, waiting in the INBOX, or filed in a course. */
+export function listRecordings(): RecordingItem[] {
+  const dir = inVault('08-RECORDINGS')
+  if (!existsSync(dir)) return []
+  const byAudio = new Map<string, { note: string; text: string }>()
+  for (const abs of allNotes()) {
+    const text = readFileSync(abs, 'utf8')
+    const m = text.match(/^audio: (.+)$/m)
+    if (m) byAudio.set(m[1].trim(), { note: relative(vaultPath(), abs), text })
+  }
+  return readdirSync(dir)
+    .filter(f => /\.(m4a|wav|mp3|aac|aiff?|caf|flac|mp4|mov|m4v)$/i.test(f))
+    .map(f => {
+      const audio = `08-RECORDINGS/${f}`
+      const st = statSync(join(dir, f))
+      const n = byAudio.get(audio)
+      const fm = n?.text.match(/^status: (.+)$/m)?.[1]
+      const open = [...openRecordings()].some(r => r === n?.note)
+      const status: RecordingItem['status'] = open ? 'recording'
+        : !n || fm === 'recording' || fm === 'not-transcribed' || !/## Transcript\n\S/.test(n.text) ? 'not-transcribed'
+        : n.note.startsWith('00-INBOX/') ? 'transcribed' : 'filed'
+      const course = n?.note.startsWith('02-COURSES/') ? n.note.split('/')[1] : null
+      const title = n?.text.match(/^# (.+)$/m)?.[1] ?? f
+      return { audio, note: n?.note ?? null, title, date: st.mtime.toISOString(), sizeMB: Math.round(st.size / 104857.6) / 10, status, course }
+    })
+    .sort((a, b) => b.date.localeCompare(a.date))
+}
+
+const openRecordings = () => open.keys()
+
+/** A recording found without a note (e.g. the app closed mid-class): give it one so it can be transcribed. */
+export function ensureNoteFor(audio: string): string {
+  const existing = listRecordings().find(r => r.audio === audio)?.note
+  if (existing) return existing
+  const base = audio.split('/').pop()!.replace(/\.[^.]+$/, '')
+  const rel = `00-INBOX/${base}-recording.md`
+  const day = base.slice(0, 10)
+  writeNote(rel, `---\ntype: lecture\ndate: ${day}\naudio: ${audio}\nstatus: not-transcribed\ntags: [lecture]\n---\n# Class recording — ${day}\n\n![[${audio}]]\n\n## Transcript\n`)
+  return rel
+}

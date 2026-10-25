@@ -12,6 +12,14 @@ const bundledDir = app.isPackaged
 const BUNDLED = existsSync(join(bundledDir, 'codex'))
 const CODEX = BUNDLED ? join(bundledDir, 'codex') : 'codex'
 
+// obsidian-mcp gives Codex BM25-ranked search over the brain (index lives in <brain>/.obsidian-mcp).
+const SEARCH = app.isPackaged
+  ? join(process.resourcesPath, 'obsidian-mcp', 'obsidian-mcp')
+  : join(app.getAppPath(), 'vendor', 'obsidian-mcp', process.arch, 'obsidian-mcp')
+const searchArgs = () => existsSync(SEARCH)
+  ? ['-c', `mcp_servers.brain.command=${JSON.stringify(SEARCH)}`, '-c', `mcp_servers.brain.args=[${JSON.stringify(vaultPath())}]`]
+  : []
+
 /** Downloaded apps carry the quarantine flag; clear it on our own helper binaries. */
 export function prepareCodex() {
   if (!BUNDLED || !app.isPackaged) return
@@ -44,10 +52,12 @@ function describe(cmd: string): string {
   return inner.length > 80 ? inner.slice(0, 80) + '…' : inner
 }
 
-export function runCodex(prompt: string, sessionId: string | null, onEvent: (e: CodexEvent) => void): Promise<{ sessionId: string | null; text: string }> {
-  const args = ['exec', '--json', '-C', vaultPath(), '-s', 'workspace-write', '--skip-git-repo-check']
-  if (sessionId) args.push('resume', sessionId, prompt)
-  else args.push(prompt)
+export function runCodex(prompt: string, sessionId: string | null, onEvent: (e: CodexEvent) => void, images: string[] = []): Promise<{ sessionId: string | null; text: string }> {
+  const args = ['exec', '--json', '-C', vaultPath(), '-s', 'workspace-write', '--skip-git-repo-check', ...searchArgs()]
+  // --image=<path> (not -i <path>): the flag is variadic and would swallow the prompt.
+  const img = images.map(p => `--image=${p}`)
+  if (sessionId) args.push('resume', sessionId, ...img, prompt)
+  else args.push(...img, prompt)
 
   return new Promise(res => {
     const child = spawn(CODEX, args, { env, cwd: vaultPath(), stdio: ['ignore', 'pipe', 'pipe'] })
@@ -70,6 +80,11 @@ export function runCodex(prompt: string, sessionId: string | null, onEvent: (e: 
           } else if (ev.type === 'item.completed' && ev.item?.type === 'agent_message') {
             last = ev.item.text
             onEvent({ kind: 'message', text: ev.item.text })
+          } else if (ev.type === 'item.started' && ev.item?.type === 'mcp_tool_call') {
+            const a = ev.item.arguments ?? {}
+            const what = a.query ?? a.path ?? a.pattern ?? ''
+            const verb = /search/.test(ev.item.tool) ? 'Searching your brain' : /read/.test(ev.item.tool) ? 'Reading' : ev.item.tool
+            onEvent({ kind: 'command', text: what ? `${verb}: ${String(what).slice(0, 60)}` : verb })
           } else if (ev.type === 'item.started' && ev.item?.type === 'command_execution') {
             onEvent({ kind: 'command', text: describe(ev.item.command) })
           } else if (ev.type === 'item.completed' && ev.item?.type === 'file_change') {
