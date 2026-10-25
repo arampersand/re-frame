@@ -15,7 +15,7 @@ const CODEX = BUNDLED ? join(bundledDir, 'codex') : 'codex'
 /** Downloaded apps carry the quarantine flag; clear it on our own helper binaries. */
 export function prepareCodex() {
   if (!BUNDLED || !app.isPackaged) return
-  try { execFileSync('xattr', ['-dr', 'com.apple.quarantine', bundledDir]) } catch { /* not quarantined or read-only */ }
+  try { execFileSync('xattr', ['-dr', 'com.apple.quarantine', process.resourcesPath]) } catch { /* not quarantined or read-only */ }
 }
 
 // Apps launched from Finder don't inherit the shell PATH: ask the login shell, plus common spots.

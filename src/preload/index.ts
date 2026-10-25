@@ -39,9 +39,16 @@ const api = {
     setKey: (key: string) => ipcRenderer.invoke('groq:setKey', key),
     test: () => ipcRenderer.invoke('groq:test')
   },
+  stt: {
+    status: () => ipcRenderer.invoke('stt:status'),
+    setEngine: (engine: 'local' | 'groq') => ipcRenderer.invoke('stt:setEngine', engine),
+    download: () => ipcRenderer.invoke('stt:download'),
+    onProgress: on('stt:progress')
+  },
   audio: {
     start: () => ipcRenderer.invoke('audio:start'),
     chunk: (rel: string, data: ArrayBuffer, offsetS: number) => ipcRenderer.invoke('audio:chunk', rel, data, offsetS),
+    drain: () => ipcRenderer.invoke('audio:drain'),
     finish: (rel: string) => ipcRenderer.invoke('audio:finish', rel),
     onText: on('audio:text')
   },

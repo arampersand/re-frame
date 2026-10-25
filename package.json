@@ -10,7 +10,7 @@
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit",
     "postinstall": "node node_modules/electron/install.js",
-    "dist": "node scripts/fetch-codex.mjs && electron-vite build && electron-builder --mac --arm64 --x64",
+    "dist": "node scripts/fetch-codex.mjs && sh scripts/build-whisper.sh && electron-vite build && electron-builder --mac --arm64 --x64",
     "fetch-codex": "node scripts/fetch-codex.mjs"
   },
   "dependencies": {
@@ -69,6 +69,10 @@
         {
           "from": "vendor/codex/${arch}",
           "to": "codex"
+        },
+        {
+          "from": "vendor/whisper/${arch}",
+          "to": "whisper"
         }
       ]
     },

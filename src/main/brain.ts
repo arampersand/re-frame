@@ -3,7 +3,8 @@ import { copyFileSync, existsSync, readFileSync, readdirSync, writeFileSync, mkd
 import { basename, join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { runCodex, type CodexEvent } from './codex'
-import { transcribe, TranscriptionQueue } from './groq'
+import { TranscriptionQueue } from './groq'
+import { transcribeChunk } from './stt'
 import { inVault, vaultPath, writeNote } from './vault'
 
 type Msg = { role: 'user' | 'assistant'; text: string; steps?: string[]; at: string }
@@ -67,7 +68,7 @@ const stamp = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${S
 export function lectureChunk(rel: string, audio: Buffer, offsetS: number, emit: (t: { offsetS: number; text?: string; error?: string }) => void) {
   queue.enqueue(async () => {
     try {
-      const text = await transcribe(audio, `chunk-${offsetS}.webm`)
+      const text = await transcribeChunk(audio, `chunk-${offsetS}.wav`)
       if (text) appendFileSync(inVault(rel), `[${stamp(offsetS)}] ${text}\n`)
       emit({ offsetS, text })
     } catch (e) {
@@ -75,6 +76,8 @@ export function lectureChunk(rel: string, audio: Buffer, offsetS: number, emit: 
     }
   })
 }
+
+export const drainLecture = () => queue.idle()
 
 export async function finishLecture(rel: string, emit: (e: CodexEvent) => void) {
   await queue.idle()

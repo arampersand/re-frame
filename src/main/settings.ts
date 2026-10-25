@@ -3,7 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 
-type Settings = { vaultPath: string; groqKeyEnc?: string }
+type Settings = { vaultPath: string; groqKeyEnc?: string; sttEngine?: 'local' | 'groq' }
 
 const file = () => join(app.getPath('userData'), 'settings.json')
 
@@ -14,6 +14,8 @@ export function loadSettings(): Settings {
 }
 
 function save(s: Settings) { writeFileSync(file(), JSON.stringify(s, null, 2)) }
+
+export function saveSettings(patch: Partial<Settings>) { save({ ...loadSettings(), ...patch }) }
 
 export function getGroqKey(): string | null {
   const enc = loadSettings().groqKeyEnc

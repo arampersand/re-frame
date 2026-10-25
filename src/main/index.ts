@@ -3,8 +3,17 @@ import { join } from 'node:path'
 import { ensureVault, tree, readNote, courses, vaultPath, graph } from './vault'
 import { codexStatus, codexLogin, prepareCodex } from './codex'
 import { testKey } from './groq'
+import { sttStatus, setEngine, downloadModel, type Engine } from './stt'
 import { getGroqKey, setGroqKey } from './settings'
-import { listChats, getChat, newChat, sendChat, startLecture, lectureChunk, finishLecture, importPdf } from './brain'
+import { listChats, getChat, newChat, sendChat, startLecture, lectureChunk, finishLecture, drainLecture, importPdf } from './brain'
+
+// Never die silently: log to ~/Library/Logs/MyBrainBook/main.log instead of crashing.
+import { appendFileSync, mkdirSync } from 'node:fs'
+const logLine = (msg: string) => {
+  try { const dir = app.getPath('logs'); mkdirSync(dir, { recursive: true }); appendFileSync(join(dir, 'main.log'), `${new Date().toISOString()} ${msg}\n`) } catch { /* ignore */ }
+}
+process.on('uncaughtException', e => logLine(`uncaught: ${e.stack ?? e}`))
+process.on('unhandledRejection', e => logLine(`unhandled: ${(e as Error)?.stack ?? e}`))
 
 let win: BrowserWindow | null = null
 const send = (channel: string, payload: unknown) => win?.webContents.send(channel, payload)
@@ -20,6 +29,7 @@ function createWindow(): void {
     backgroundColor: '#0f1115',
     webPreferences: { preload: join(__dirname, '../preload/index.js'), sandbox: false, contextIsolation: true }
   })
+  win.webContents.on('render-process-gone', (_e, d) => { logLine(`renderer gone: ${d.reason}`); if (d.reason !== 'clean-exit') win?.reload() })
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
     return { action: 'deny' }
@@ -54,9 +64,14 @@ function registerIpc() {
     return key ? testKey(key) : { ok: false, detail: 'No key yet' }
   })
 
+  ipcMain.handle('stt:status', () => sttStatus())
+  ipcMain.handle('stt:setEngine', (_e, engine: Engine) => { setEngine(engine); return sttStatus() })
+  ipcMain.handle('stt:download', () => downloadModel(pct => send('stt:progress', pct)))
+
   ipcMain.handle('audio:start', () => startLecture())
   ipcMain.handle('audio:chunk', (_e, rel: string, data: ArrayBuffer, offsetS: number) =>
     lectureChunk(rel, Buffer.from(data), offsetS, t => send('audio:text', { rel, ...t })))
+  ipcMain.handle('audio:drain', () => drainLecture())
   ipcMain.handle('audio:finish', (_e, rel: string) => finishLecture(rel, ev => send('task:event', { task: 'lecture', ...ev })))
 
   ipcMain.handle('pdf:pick', async () => {

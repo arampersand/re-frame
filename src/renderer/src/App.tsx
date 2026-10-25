@@ -24,7 +24,7 @@ export function App() {
 
   const refreshStatus = () => {
     rf.codex.status().then(s => setCodexOk(s.loggedIn))
-    rf.groq.status().then(s => setGroqOk(s.hasKey))
+    rf.stt.status().then(s => setGroqOk(s.ready))
   }
   useEffect(refreshStatus, [screen])
   useEffect(() => { rf.codex.status().then(s => setWelcome(!s.loggedIn)) }, [])
@@ -48,12 +48,12 @@ export function App() {
         ))}
         <div className="no-drag mt-auto space-y-1.5 px-2 text-xs text-muted">
           <button className="flex items-center gap-2" onClick={() => setScreen('integrations')}><Dot ok={codexOk} /> AI · Codex</button>
-          <button className="flex items-center gap-2" onClick={() => setScreen('integrations')}><Dot ok={groqOk} /> Transcription · Groq</button>
+          <button className="flex items-center gap-2" onClick={() => setScreen('integrations')}><Dot ok={groqOk} /> Transcription</button>
         </div>
       </nav>
       <main className="min-w-0 flex-1 overflow-hidden">
         {screen === 'chat' && <ChatScreen onOpenNote={openNote} />}
-        {screen === 'record' && <RecordScreen onOpenNote={openNote} />}
+        {screen === 'record' && <RecordScreen onOpenNote={openNote} onSetup={() => setScreen('integrations')} />}
         {screen === 'brain' && <BrainScreen selected={note} onSelect={setNote} />}
         {screen === 'integrations' && <IntegrationsScreen onChange={refreshStatus} />}
       </main>
